@@ -20,6 +20,7 @@ type Review = {
 export default function ReviewsPanel({ isDark, t, setSuccess, setError }: any) {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isInitializing, setIsInitializing] = useState(false);
   const [filterMode, setFilterMode] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
 
   useEffect(() => {
@@ -106,6 +107,26 @@ export default function ReviewsPanel({ isDark, t, setSuccess, setError }: any) {
     }
   };
 
+  const handleInitializeDb = async () => {
+    if (!confirm(t("This will create missing database tables. Continue?"))) return;
+    setIsInitializing(true);
+    try {
+      const res = await fetch("/api/admin/setup-db");
+      const data = await res.json();
+      if (data.success) {
+        setSuccess(t("Database initialized successfully!"));
+        fetchReviews();
+      } else {
+        setError(data.error || t("Failed to initialize database"));
+      }
+    } catch (err) {
+      console.error("DB Initialization error:", err);
+      setError(t("An error occurred during initialization"));
+    } finally {
+      setIsInitializing(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <Card className={isDark ? "bg-[#12121a] border-[#ff6b35]/10" : "bg-white border-[#ff6b35]/20"}>
@@ -128,6 +149,16 @@ export default function ReviewsPanel({ isDark, t, setSuccess, setError }: any) {
           </CardTitle>
         </div>
         <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleInitializeDb}
+            disabled={isInitializing}
+            className="border-amber-500/50 text-amber-500 hover:bg-amber-500/10"
+          >
+            {isInitializing ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <CheckCircle className="w-4 h-4 mr-1" />}
+            {t("Initialize DB")}
+          </Button>
           {['all', 'pending', 'approved', 'rejected'].map(mode => (
             <Button
               key={mode}
@@ -144,8 +175,17 @@ export default function ReviewsPanel({ isDark, t, setSuccess, setError }: any) {
       
       <CardContent className="pt-6">
         {filteredReviews.length === 0 ? (
-          <div className="text-center py-10 text-muted-foreground">
-            {t("No reviews found")}
+          <div className="text-center py-10 space-y-4">
+            <p className="text-muted-foreground">{t("No reviews found or table missing.")}</p>
+            <Button 
+                onClick={handleInitializeDb} 
+                disabled={isInitializing}
+                variant="outline"
+                className="border-[#ff6b35] text-[#ff6b35] hover:bg-[#ff6b35]/5"
+            >
+                {isInitializing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <MessageSquare className="w-4 h-4 mr-2" />}
+                {t("Setup Reviews Table")}
+            </Button>
           </div>
         ) : (
           <div className="space-y-4">

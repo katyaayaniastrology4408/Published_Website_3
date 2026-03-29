@@ -78,13 +78,26 @@ INSERT INTO public.offer_settings (
     });
 
     if (error) {
-      // If RPC fails (which it might if not set up), try a direct query if possible
+      // If RPC fails (which it might if not set up), provide clear instructions
       console.error("Migration error:", error);
-      return NextResponse.json({ success: false, error: error.message });
+      return NextResponse.json({ 
+        success: false, 
+        error: `Migration failed: ${error.message}. 
+        
+Please ensure you have created the 'exec_sql' RPC in your Supabase SQL editor:
+
+CREATE OR REPLACE FUNCTION public.exec_sql(sql_query text)
+RETURNS void AS $$
+BEGIN
+  EXECUTE sql_query;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;`
+      });
     }
 
-    return NextResponse.json({ success: true, message: "Database reset and ₹501 offer activated for fresh start!" });
+    return NextResponse.json({ success: true, message: "Database tables created and initialized successfully!" });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message });
   }
 }
+

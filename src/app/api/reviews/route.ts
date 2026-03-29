@@ -72,9 +72,15 @@ export async function POST(req: NextRequest) {
 
     if (insertError) {
       console.error("Reviews Database Error:", insertError);
+      
+      let errorMsg = insertError.message;
+      if (insertError.message.includes("relation \"reviews\" does not exist") || insertError.message.includes("could not find the table")) {
+        errorMsg = "Database error: table 'reviews' not found. Please contact the administrator to initialize the database from the Admin Dashboard.";
+      }
+
       return NextResponse.json({ 
         success: false, 
-        error: `Database error: ${insertError.message}. Please verify that the 'reviews' table exists in your Supabase 'public' schema.` 
+        error: errorMsg
       }, { status: 500 });
     }
 
