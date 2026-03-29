@@ -1,13 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { supabase, supabaseAdmin } from "@/lib/supabase";
 import { sendEmail } from "@/lib/email.config";
-
-export const dynamic = "force-dynamic";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 // GET: Fetch approved reviews for the public website
 export async function GET(req: NextRequest) {

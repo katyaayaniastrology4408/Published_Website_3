@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { supabaseAdmin as supabase } from "@/lib/supabase";
 
 export async function DELETE(req: NextRequest) {
   try {
@@ -9,15 +9,6 @@ export async function DELETE(req: NextRequest) {
     if (!token) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "placeholder-key";
-
-    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
-      auth: { autoRefreshToken: false, persistSession: false },
-    });
-
-    // Verify the user
     const { data: { user }, error: userError } = await supabase.auth.getUser(token);
     if (userError || !user) {
       return NextResponse.json({ error: "Invalid session" }, { status: 401 });
@@ -40,7 +31,7 @@ export async function DELETE(req: NextRequest) {
     if (userEmail) {
       const { data: bookings } = await supabase.from("bookings").select("id").eq("email", userEmail);
       if (bookings && bookings.length > 0) {
-        const bookingIds = bookings.map(b => b.id);
+        const bookingIds = bookings.map((b: any) => b.id);
         await supabase.from("consultation_notes").delete().in("booking_id", bookingIds);
         await supabase.from("invoices").delete().in("booking_id", bookingIds);
         await supabase.from("meeting_codes").delete().in("booking_id", bookingIds);
