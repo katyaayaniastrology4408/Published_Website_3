@@ -133,21 +133,11 @@ export async function GET(req: Request) {
 
     await supabaseAdmin.from("profiles").upsert(profileUpdate, { onConflict: "id" });
 
-    // Sync to newsletter subscribers
+    // Sync to newsletter subscribers - only name and email
     await syncToSubscribers(googleUser.email, googleUser.name || "", "google_signup", false).catch(() => {});
 
-    // Send welcome back email for existing users
-    if (!isNew) {
-      sendWelcomeBackEmail({
-        email: googleUser.email,
-        name: existingProfile?.name || googleUser.name || "Seeker",
-      }).catch((err) => console.error("Welcome back email error:", err));
-    }
-    // For new users, welcome email sent after completing profile in /complete-profile
-
-    // Redirect logic: only new users go to complete-profile by default.
-    // Existing users go to home, even if profile is "incomplete", per user request to reduce friction.
-    const redirectTarget = (isNew) ? "complete-profile" : "home";
+    // For Google users, we always go to home now. They can update profile later.
+    const redirectTarget = "home";
 
     // Create a magic link session for the user so Supabase client picks up the session
     const { data: sessionData, error: sessionError } = await supabaseAdmin.auth.admin.generateLink({
@@ -160,13 +150,17 @@ export async function GET(req: Request) {
 
     if (sessionError || !sessionData?.properties?.hashed_token) {
       console.error("Session link error:", sessionError);
-      const response = NextResponse.redirect(`${appUrl}/auth/google-complete?uid=${supabaseUserId}&isNew=${isNew}&target=${redirectTarget}`);
-      return response;
+      return NextResponse.redirect(`${appUrl}/auth/google-complete?uid=${supabaseUserId}&isNew=${isNew}&target=${redirectTarget}`);
     }
 
     // Redirect to the magic link to establish session
-    const actionLink = sessionData.properties.action_link;
+    let actionLink = sessionData.properties.action_link;
     if (actionLink) {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      // CRITICAL: Route via proxy if in India context to avoid hang on .supabase.co
+      if (supabaseUrl && actionLink.startsWith(supabaseUrl)) {
+        actionLink = actionLink.replace(supabaseUrl, `${appUrl}/api/sb-proxy`);
+      }
       return NextResponse.redirect(actionLink);
     }
 

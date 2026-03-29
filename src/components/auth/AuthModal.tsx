@@ -12,6 +12,8 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { supabase } from "@/lib/supabase";
 import { useTranslation } from "@/components/GoogleTranslateWidget";
 
+import { toast } from "sonner";
+
 export default function AuthModal() {
   const { isAuthModalOpen, hideAuthModal, authView } = useAuth();
   const { theme } = useTheme();
@@ -48,6 +50,7 @@ export default function AuthModal() {
   };
 
   const handleGoogleSignIn = () => {
+    toast.loading("Connecting to Google...");
     window.location.href = "/api/auth/google";
   };
 
@@ -80,6 +83,7 @@ export default function AuthModal() {
       }
 
       setSuccess(true);
+      toast.success("Account created successfully!");
       setTimeout(() => {
         hideAuthModal();
         resetFields();
@@ -88,6 +92,7 @@ export default function AuthModal() {
       }, 1500);
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred.");
+      toast.error(err.message || "Signup failed");
     } finally {
       setIsLoading(false);
     }
@@ -122,6 +127,7 @@ export default function AuthModal() {
       }
 
       setSuccess(true);
+      toast.success("Welcome back!");
       setTimeout(() => {
         hideAuthModal();
         resetFields();
@@ -129,11 +135,11 @@ export default function AuthModal() {
         router.refresh();
       }, 1500);
     } catch (err: any) {
-      if (err.message && err.message.includes("does not match")) {
-          setError("Name or date of birth does not match our records.");
-      } else {
-        setError(err.message || "An unexpected error occurred.");
-      }
+      const msg = err.message && err.message.includes("does not match") 
+        ? "Name or date of birth does not match our records."
+        : err.message || "An unexpected error occurred.";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setIsLoading(false);
     }

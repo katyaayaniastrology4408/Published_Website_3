@@ -61,13 +61,13 @@ export default function ReviewsClient() {
 
   useEffect(() => {
     setMounted(true);
-    fetch('/api/feedback?minRating=1')
+    fetch('/api/reviews?minRating=1')
       .then(r => r.json())
       .then(json => {
-        if (json.success && Array.isArray(json.data)) {
-          setDbReviews(json.data.map((f: any) => ({ 
+        if (json.success && Array.isArray(json.reviews)) {
+          setDbReviews(json.reviews.map((f: any) => ({ 
             name: f.name, 
-            text: f.comment, 
+            text: f.message || f.text || f.comment, // Fallback to multiple field names
             rating: f.rating,
             created_at: f.created_at 
           })));

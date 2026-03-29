@@ -56,10 +56,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: "Only 3, 4, or 5 star ratings are allowed" }, { status: 400 });
     }
 
-    const supabaseAdmin = getSupabaseAdmin();
+    const sbAdmin = getSupabaseAdmin();
 
     // 3. Database Insertion (Status automatically approved for 3+ stars)
-    const { data: insertData, error: insertError } = await supabaseAdmin
+    const { data: insertData, error: insertError } = await sbAdmin
       .from("reviews")
       .insert({
         name,
@@ -71,8 +71,11 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (insertError) {
-      console.error("Database insertion error:", insertError.message);
-      return NextResponse.json({ success: false, error: insertError.message || "Database error" }, { status: 500 });
+      console.error("Reviews Database Error:", insertError);
+      return NextResponse.json({ 
+        success: false, 
+        error: `Database error: ${insertError.message}. Please verify that the 'reviews' table exists in your Supabase 'public' schema.` 
+      }, { status: 500 });
     }
 
     // 4. Send Email Notification to Admin (Informational only)

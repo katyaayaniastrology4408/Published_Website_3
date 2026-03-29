@@ -63,6 +63,7 @@ async function handleProxy(req: NextRequest, paramsPromise: Promise<{ path: stri
       headers,
       body,
       cache: "no-store",
+      redirect: "manual",
     });
 
     // Get the response body
@@ -70,10 +71,23 @@ async function handleProxy(req: NextRequest, paramsPromise: Promise<{ path: stri
 
     // Copy response headers back
     const responseHeaders = new Headers();
-    const headersToCopyBack = ["content-type", "content-range", "preference-applied"];
+    const headersToCopyBack = [
+      "content-type", 
+      "content-range", 
+      "preference-applied", 
+      "location", 
+      "set-cookie"
+    ];
+    
     response.headers.forEach((value, key) => {
       if (headersToCopyBack.includes(key.toLowerCase())) {
-        responseHeaders.set(key, value);
+        let val = value;
+        // CRITICAL: Rewrite Location header if it points to Supabase directly
+        if (key.toLowerCase() === 'location' && val.startsWith(supabaseUrl)) {
+          const appUrl = req.nextUrl.origin;
+          val = val.replace(supabaseUrl, `${appUrl}/api/sb-proxy`);
+        }
+        responseHeaders.set(key, val);
       }
     });
 

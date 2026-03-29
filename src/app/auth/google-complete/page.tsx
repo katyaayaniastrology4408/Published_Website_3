@@ -24,32 +24,9 @@ function GoogleCompleteInner() {
         return;
       }
 
-      // If server already determined the target, use it directly
-      if (target === "home") {
-        router.replace("/");
-        return;
-      }
-
-      if (target === "complete-profile" || isNew) {
-        router.replace("/complete-profile");
-        return;
-      }
-
-      // Fallback: check profile completeness client-side
-      const { data: profile } = await (supabase as any)
-        .from("profiles")
-        .select("dob, pob, phone, gender, address")
-        .eq("id", user.id)
-        .maybeSingle();
-
-      const isComplete = profile?.dob && profile?.pob && profile?.phone && profile?.gender && profile?.address;
-
-      // Fallback: only new users go to complete-profile by default.
-      if (isNew && !isComplete) {
-        router.replace("/complete-profile");
-      } else {
-        router.replace("/");
-      }
+      // Always redirect to home for Google auth to reduce friction.
+      // They only give us the name, details to be added later on profile page.
+      router.replace("/");
     };
 
     finish();

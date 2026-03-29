@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Star, Send, CheckCircle, MessageSquare } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -104,6 +105,7 @@ export default function FeedbackPage() {
     }
 
     setIsLoading(true);
+    toast.loading("Submitting your review...");
 
     try {
         const response = await fetch("/api/reviews", {
@@ -121,16 +123,21 @@ export default function FeedbackPage() {
 
       if (response.ok) {
         setIsSubmitted(true);
+        toast.success("Review submitted! Thank you.");
       } else {
         const result = await response.json();
-        setErrorMsg(result.error || "Failed to submit feedback");
+        const errorText = result.error || "Failed to submit feedback";
+        setErrorMsg(errorText);
+        toast.error(errorText);
         generateCaptcha();
       }
     } catch (error) {
       console.error("Error submitting feedback:", error);
       setErrorMsg("An unexpected error occurred.");
+      toast.error("An unexpected error occurred.");
     } finally {
       setIsLoading(false);
+      toast.dismiss();
     }
   };
 
