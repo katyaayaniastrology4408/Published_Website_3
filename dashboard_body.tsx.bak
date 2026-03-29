@@ -1,0 +1,1261 @@
+export default function AdminDashboard() {
+  const { theme, toggleTheme } = useTheme();
+  const { t } = useTranslation();
+  const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isActionLoading, setIsActionLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<UserRecord | null>(null);
+  const [selectedEnquiry, setSelectedEnquiry] = useState<Enquiry | null>(null);
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{ table: string, id: string } | null>(null);
+
+  // Stats
+  const [stats, setStats] = useState({
+    totalBookings: 0,
+    totalUsers: 0,
+    totalEnquiries: 0,
+    totalRevenue: 0
+  });
+
+  // Data
+  const [recentActivity, setRecentActivity] = useState<Activity[]>([]);
+  const [blockedDates, setBlockedDates] = useState<BlockedDate[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [enquiries, setEnquiries] = useState<Enquiry[]>([]);
+  const [users, setUsers] = useState<UserRecord[]>([]);
+  const [feedbacks, setFeedbacks] = useState<FeedbackRecord[]>([]);
+  const [resetRequests, setResetRequests] = useState<PasswordResetRequest[]>([]);
+  
+  const [newBlockedDate, setNewBlockedDate] = useState({ date: "", reason: "" });
+  const [availabilityFilterDate, setAvailabilityFilterDate] = useState("");
+  
+  // Settings
+  const [adminSettings, setAdminSettings] = useState({
+    email: "",
+    botToken: "",
+    chatId: ""
+  });
+  const [passwords, setPasswords] = useState({
+    current: "",
+    new: "",
+    confirm: ""
+  });
+
+  useEffect(() => {
+    setMounted(true);
+    checkAuth();
+    fetchData();
+  }, []);
+
+  const checkAuth = () => {
+    const auth = localStorage.getItem("admin_auth");
+    if (!auth) {
+      router.push("/admin/signin");
+    }
+  };
+
+  const fetchData = async () => {
+    setIsLoading(true);
+    try {
+      const { count: bookingCount } = await supabase.from('bookings').select('*', { count: 'exact', head: true });
+      const { count: userCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
+      const { count: enquiryCount } = await supabase.from('enquiries').select('*', { count: 'exact', head: true });
+      
+      const { data: revenueData } = await supabase.from('bookings').select('amount').eq('payment_status', 'completed');
+      const totalRevenue = revenueData?.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0) || 0;
+
+      setStats({
+        totalBookings: bookingCount || 0,
+        totalUsers: userCount || 0,
+        totalEnquiries: enquiryCount || 0,
+        totalRevenue
+      });
+
+      const [bookingsRes, usersRes, enquiriesRes, feedbackRes, blockedRes, resetRequestsRes] = await Promise.all([
+        supabase.from('bookings').select('*').order('created_at', { ascending: false }),
+        supabase.from('profiles').select('*').order('created_at', { ascending: false }),
+        supabase.from('enquiries').select('*').order('created_at', { ascending: false }),
+        supabase.from('feedback').select('*').order('created_at', { ascending: false }),
+        supabase.from('blocked_dates').select('*').order('date', { ascending: true }),
+        supabase.from('password_reset_requests').select('*').order('created_at', { ascending: false })
+      ]);
+
+      const bData = bookingsRes.data || [];
+      const uData = usersRes.data || [];
+      const eData = enquiriesRes.data || [];
+      const fData = feedbackRes.data || [];
+      const blData = blockedRes.data || [];
+      const rData = resetRequestsRes.data || [];
+
+      setBookings(bData);
+      setUsers(uData);
+      setEnquiries(eData);
+      setFeedbacks(fData);
+      setBlockedDates(blData);
+      setResetRequests(rData);
+
+      const combined: Activity[] = [
+        ...bData.slice(0, 5).map(b => ({
+          id: b.id,
+          type: 'booking' as const,
+          title: t('New Booking: ') + b.full_name,
+          description: t(b.service_type) + t(' on ') + b.booking_date,
+          time: b.created_at,
+          status: b.payment_status
+        })),
+        ...uData.slice(0, 5).map(u => ({
+          id: u.id,
+          type: 'user' as const,
+          title: t('New User: ') + u.full_name,
+          description: t('Joined from ') + u.email,
+          time: u.created_at
+        })),
+        ...eData.slice(0, 5).map(e => ({
+          id: e.id,
+          type: 'enquiry' as const,
+          title: t('New Enquiry: ') + e.name,
+          description: e.subject || t('General Inquiry'),
+          time: e.created_at
+        })),
+        ...fData.slice(0, 5).map(f => ({
+          id: f.id,
+          type: 'feedback' as const,
+          title: t('Feedback: ') + f.name,
+          description: `${f.rating} ` + t('Stars') + ' - ' + f.message.substring(0, 50) + '...',
+          time: f.created_at
+        })),
+        ...rData.slice(0, 5).map(r => ({
+          id: r.id,
+          type: 'reset_request' as const,
+          title: t('Password Reset Request'),
+          description: r.email,
+          time: r.created_at,
+          status: r.status
+        }))
+        ].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()).slice(0, 20);
+
+        setRecentActivity(combined);
+
+      const { data: settings } = await supabase.from('admin_settings').select('*');
+      const settingsMap = (settings || []).reduce((acc: any, curr) => {
+        acc[curr.key] = curr.value;
+        return acc;
+      }, {});
+
+      setAdminSettings({
+        email: settingsMap['admin_email'] || "",
+        botToken: settingsMap['telegram_bot_token'] || "",
+        chatId: settingsMap['telegram_chat_id'] || ""
+      });
+
+    } catch (err) {
+      console.error(err);
+      setError("Failed to fetch data");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSendResetEmail = (email: string, password?: string) => {
+    const gmailUrl = getGmailLink({ email, password }, "password_reset_draft");
+    window.parent.postMessage({ type: "OPEN_EXTERNAL_URL", data: { url: gmailUrl } }, "*");
+  };
+
+  const handleResetUserPassword = async (email: string) => {
+    setIsActionLoading(true);
+    try {
+      const response = await fetch("/api/admin/users/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        setSuccess(t("Password reset successful. Opening Gmail..."));
+        handleSendResetEmail(data.email, data.password);
+      } else {
+        setError(data.error || t("Failed to reset password"));
+      }
+    } catch (err) {
+      setError(t("An error occurred while resetting password"));
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("admin_auth");
+    router.push("/admin/signin");
+  };
+
+  const handleBlockDate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsActionLoading(true);
+    try {
+      const { error } = await supabase.from('blocked_dates').insert([
+        { date: newBlockedDate.date, reason: newBlockedDate.reason }
+      ]);
+      if (error) throw error;
+      setSuccess(t("Date blocked successfully"));
+      setNewBlockedDate({ date: "", reason: "" });
+      fetchData();
+    } catch (err) {
+      setError(t("Failed to block date"));
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
+
+  const handleUnblockDate = async (id: string) => {
+    setIsActionLoading(true);
+    try {
+      const { error } = await supabase.from('blocked_dates').delete().eq('id', id);
+      if (error) throw error;
+      setSuccess(t("Date unblocked successfully"));
+      fetchData();
+    } catch (err) {
+      setError(t("Failed to unblock date"));
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
+
+  const handleDeleteRecord = async (table: string, id: string) => {
+    setIsActionLoading(true);
+    try {
+      const { error } = await supabase.from(table).delete().eq('id', id);
+      if (error) throw error;
+      setSuccess(t("Record deleted successfully"));
+      fetchData();
+    } catch (err) {
+      setError(t("Failed to delete record"));
+    } finally {
+      setIsActionLoading(false);
+      setDeleteConfirmation(null);
+    }
+  };
+
+  const handleUpdateSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsActionLoading(true);
+    try {
+      const settingsToUpdate = [
+        { key: 'admin_email', value: adminSettings.email },
+        { key: 'telegram_bot_token', value: adminSettings.botToken },
+        { key: 'telegram_chat_id', value: adminSettings.chatId }
+      ];
+
+      for (const item of settingsToUpdate) {
+        await supabase.from('admin_settings').upsert(item, { onConflict: 'key' });
+      }
+      
+      setSuccess(t("Settings updated successfully"));
+    } catch (err) {
+      setError(t("Failed to update settings"));
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
+
+  const handleUpdatePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (passwords.new !== passwords.confirm) {
+      setError(t("Passwords do not match"));
+      return;
+    }
+    setIsActionLoading(true);
+    try {
+      const response = await fetch("/api/admin/auth/update-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          currentPassword: passwords.current,
+          newPassword: passwords.new 
+        }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        setSuccess(t("Password updated successfully"));
+        setPasswords({ current: "", new: "", confirm: "" });
+      } else {
+        setError(data.error || t("Failed to update password"));
+      }
+    } catch (err) {
+      setError(t("An error occurred"));
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
+
+  const handleSendRescheduleEmail = (booking: Booking) => {
+    const gmailUrl = getGmailLink(booking, "reschedule_draft");
+    window.parent.postMessage({ type: "OPEN_EXTERNAL_URL", data: { url: gmailUrl } }, "*");
+  };
+
+
+  // Filtered Data
+  const filteredActivity = useMemo(() => {
+    if (!searchTerm) return recentActivity;
+    return recentActivity.filter(a => 
+      a.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      a.description.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [recentActivity, searchTerm]);
+
+  const filteredBookings = useMemo(() => {
+    return bookings.filter(b => 
+      b.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      b.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      b.service_type.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [bookings, searchTerm]);
+
+  const filteredUsers = useMemo(() => {
+    return users.filter(u => 
+      u.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      u.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      u.phone.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [users, searchTerm]);
+
+  const filteredEnquiries = useMemo(() => {
+    return enquiries.filter(e => 
+      e.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      e.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      e.subject?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [enquiries, searchTerm]);
+
+  const filteredResetRequests = useMemo(() => {
+    return resetRequests.filter(r => 
+      r.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      r.phone?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [resetRequests, searchTerm]);
+
+  if (!mounted) return null;
+
+  const isDark = theme === 'dark';
+
+  const filteredBookingsByDate = availabilityFilterDate 
+    ? bookings.filter(b => b.booking_date === availabilityFilterDate)
+    : [];
+
+  return (
+    <div className={`min-h-screen flex ${isDark ? 'bg-[#0a0a0f] text-[#f5f0e8]' : 'bg-[#fcfaf7] text-[#2d1810]'}`}>
+      {/* Sidebar - Desktop */}
+      <aside className={`w-64 border-r ${isDark ? 'bg-[#12121a] border-[#ff6b35]/20' : 'bg-white border-[#ff6b35]/20'} hidden lg:flex flex-col sticky top-0 h-screen`}>
+        <SidebarContent 
+          activeTab={activeTab} 
+          setActiveTab={setActiveTab} 
+          handleLogout={handleLogout} 
+          isDark={isDark} 
+          t={t} 
+        />
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <header className={`h-16 border-b flex items-center justify-between px-4 md:px-6 ${isDark ? 'bg-[#12121a]/50 border-[#ff6b35]/10' : 'bg-white/5 border-[#ff6b35]/10'} backdrop-blur-md sticky top-0 z-20`}>
+            <div className="flex items-center gap-4 flex-1">
+              {/* Mobile Sidebar Trigger */}
+              <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon" className="lg:hidden text-[#ff6b35]">
+                    <Menu className="w-6 h-6" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className={`p-0 w-64 ${isDark ? 'bg-[#12121a] border-[#ff6b35]/20' : 'bg-white border-[#ff6b35]/20'}`}>
+                  <SheetTitle className="sr-only">Admin Navigation</SheetTitle>
+                  <SheetDescription className="sr-only">
+                    Sidebar navigation for the administration panel
+                  </SheetDescription>
+                  <SidebarContent 
+                    activeTab={activeTab} 
+                    setActiveTab={(tab) => {
+                      setActiveTab(tab);
+                      setIsMobileMenuOpen(false);
+                    }} 
+                    handleLogout={handleLogout} 
+                    isDark={isDark} 
+                    t={t} 
+                  />
+                </SheetContent>
+              </Sheet>
+
+              <div className="relative max-w-md w-full hidden sm:block">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input 
+                  placeholder={t("Search anything...")} 
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className={`pl-9 ${isDark ? 'bg-[#1a1a2e] border-[#ff6b35]/10' : 'bg-[#fcfaf7] border-[#ff6b35]/20'}`} 
+                />
+              </div>
+            </div>
+            <div className="flex items-center gap-2 md:gap-4">
+              <div>
+                <GoogleTranslateWidget />
+              </div>
+              <Button variant="ghost" size="icon" onClick={toggleTheme} className="text-[#ff6b35]">
+                {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              </Button>
+              
+              <div className="relative">
+              <Button variant="ghost" size="icon" className="relative text-[#ff6b35]" onClick={() => setShowNotifications(!showNotifications)}>
+                <Bell className="w-5 h-5" />
+                {recentActivity.length > 0 && (
+                  <span className="absolute top-2 right-2 w-2 h-2 bg-[#ff6b35] rounded-full border-2 border-background animate-pulse"></span>
+                )}
+              </Button>
+              
+              <AnimatePresence>
+                {showNotifications && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setShowNotifications(false)} />
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      className={`absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 rounded-2xl shadow-2xl border overflow-hidden ${isDark ? 'bg-[#1a1a2e] border-[#ff6b35]/20' : 'bg-white border-[#ff6b35]/20'} z-50`}
+                    >
+                        <div className="p-4 border-b border-[#ff6b35]/10 flex justify-between items-center bg-[#ff6b35]/5">
+                          <h3 className="font-bold text-sm flex items-center gap-2 text-[#ff6b35]"><Bell className="w-4 h-4" /> {t("Latest Activities")}</h3>
+                          <span className="text-[10px] bg-[#ff6b35] text-white px-2 py-0.5 rounded-full font-bold">{recentActivity.length} New</span>
+                        </div>
+                        <div className="max-h-[400px] overflow-y-auto p-2 space-y-1">
+                          {recentActivity.length > 0 ? recentActivity.map((act) => (
+                            <div 
+                              key={act.id} 
+                              onClick={() => {
+                                if (act.type === 'booking') {
+                                  const b = bookings.find(x => x.id === act.id);
+                                  if (b) setSelectedBooking(b);
+                                } else if (act.type === 'enquiry') {
+                                  const e = enquiries.find(x => x.id === act.id);
+                                  if (e) setSelectedEnquiry(e);
+                                } else if (act.type === 'user') {
+                                  const u = users.find(x => x.id === act.id);
+                                  if (u) setSelectedUser(u);
+                                }
+                                setShowNotifications(false);
+                              }}
+                              className={`p-3 rounded-xl flex gap-3 ${isDark ? 'hover:bg-white/5' : 'hover:bg-[#ff6b35]/5'} transition-all cursor-pointer group`}
+                            >
+                              <div className={`mt-1 p-2 rounded-lg h-fit ${
+                                act.type === 'booking' ? 'bg-blue-500/10 text-blue-500' :
+                                act.type === 'user' ? 'bg-green-500/10 text-green-500' :
+                                act.type === 'reset_request' ? 'bg-red-500/10 text-red-500' :
+                                'bg-amber-500/10 text-amber-500'
+                              }`}>
+                                {act.type === 'booking' ? <Calendar className="w-3 h-3" /> :
+                                 act.type === 'user' ? <UserPlus className="w-3 h-3" /> :
+                                 act.type === 'reset_request' ? <KeyRound className="w-3 h-3" /> :
+                                 <MessageSquare className="w-3 h-3" />}
+                              </div>
+                              <div className="min-w-0">
+                                <p className="text-xs font-bold group-hover:text-[#ff6b35] transition-colors">{t(act.title)}</p>
+                                <p className="text-[10px] text-muted-foreground truncate">{t(act.description)}</p>
+                                <p className="text-[8px] text-muted-foreground mt-1 flex items-center gap-1 opacity-60">
+                                  <Clock className="w-2 h-2" /> {new Date(act.time).toLocaleTimeString()}
+                                </p>
+                              </div>
+                            </div>
+                          )) : (
+                            <div className="py-10 text-center text-xs text-muted-foreground italic">{t("No recent activities")}</div>
+                          )}
+                        </div>
+                        <div className="p-3 border-t border-[#ff6b35]/10 bg-[#ff6b35]/5">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="w-full text-[10px] font-bold text-[#ff6b35] hover:bg-[#ff6b35]/10"
+                            onClick={() => setShowNotifications(false)}
+                          >
+                            {t("Close Panel")}
+                          </Button>
+                        </div>
+
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
+            </div>
+            
+            <div className="h-8 w-8 rounded-full bg-[#ff6b35] flex items-center justify-center text-white font-bold text-xs shadow-lg">AD</div>
+          </div>
+        </header>
+
+          <div className="p-4 md:p-6 space-y-6 overflow-y-auto h-[calc(100vh-64px)]">
+            {success && <Alert message={t(success)} type="success" onClose={() => setSuccess("")} />}
+            {error && <Alert message={t(error)} type="error" onClose={() => setError("")} />}
+
+            {activeTab === "dashboard" && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                  <StatCard title={t("Total Bookings")} value={stats.totalBookings.toString()} trend="+12%" icon={<Calendar className="w-5 h-5" />} isDark={isDark} />
+                  <StatCard title={t("Total Users")} value={stats.totalUsers.toString()} trend="+5%" icon={<Users className="w-5 h-5" />} isDark={isDark} />
+                  <StatCard title={t("New Enquiries")} value={stats.totalEnquiries.toString()} trend="+8%" icon={<MessageSquare className="w-5 h-5" />} isDark={isDark} />
+                  <StatCard title={t("Total Revenue")} value={`₹${stats.totalRevenue.toLocaleString()}`} trend="+15%" icon={<CreditCard className="w-5 h-5" />} isDark={isDark} />
+                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  <Card className={`lg:col-span-2 ${isDark ? 'bg-[#12121a] border-[#ff6b35]/10' : 'bg-white border-[#ff6b35]/20'}`}>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                      <div>
+                        <CardTitle className="font-[family-name:var(--font-cinzel)] text-[#ff6b35]">{t("Recent Activity")}</CardTitle>
+                        <CardDescription>{t("Latest updates from your database")}</CardDescription>
+                      </div>
+                      <Button variant="outline" size="sm" onClick={fetchData} disabled={isLoading} className="border-[#ff6b35]/20 text-[#ff6b35]">
+                        {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+                      </Button>
+                    </CardHeader>
+                    <CardContent><div className="space-y-6">{isLoading ? <LoadingState /> : filteredActivity.length > 0 ? filteredActivity.map((activity, idx) => <ActivityItem key={activity.id + idx} activity={activity} isDark={isDark} t={t} />) : <EmptyState message={t("No recent activity found.")} />}</div></CardContent>
+                  </Card>
+                  <div className="space-y-6">
+                    <Card className={isDark ? 'bg-[#12121a] border-[#ff6b35]/10' : 'bg-white border-[#ff6b35]/20'}>
+                      <CardHeader><CardTitle className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{t("Quick Status")}</CardTitle></CardHeader>
+                      <CardContent className="space-y-4">
+                        <StatusBadge label={t("System")} value={t("Online")} color="green" />
+                        <StatusBadge label={t("Database")} value={t("Connected")} color="green" />
+                        <StatusBadge label={t("Telegram")} value={t("Linked")} color="green" />
+                      </CardContent>
+                    </Card>
+                    <Card className="bg-gradient-to-br from-[#ff6b35] to-[#ff8c5e] text-white border-none shadow-xl">
+                      <CardHeader><CardTitle className="font-[family-name:var(--font-cinzel)]">{t("Availability Control")}</CardTitle><CardDescription className="text-white/80">{t("Block dates for holidays")}</CardDescription></CardHeader>
+                      <CardContent><Button variant="secondary" className="w-full bg-white/10 hover:bg-white/20 text-white" onClick={() => setActiveTab("availability")}>{t("Open Panel")}</Button></CardContent>
+                    </Card>
+                  </div>
+                </div>
+              </div>
+            )}
+
+
+            {activeTab === "bookings" && (
+              <Card className={isDark ? 'bg-[#12121a] border-[#ff6b35]/10' : 'bg-white border-[#ff6b35]/20'}>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <div><CardTitle className="font-[family-name:var(--font-cinzel)] text-[#ff6b35]">{t("Bookings Management")}</CardTitle><CardDescription>{t("View and manage all appointments")}</CardDescription></div>
+                </CardHeader>
+                <CardContent>
+                  <div className="hidden md:block overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="border-b border-[#ff6b35]/10">
+                          <th className="p-4 font-bold text-xs uppercase tracking-widest text-muted-foreground">{t("Customer")}</th>
+                          <th className="p-4 font-bold text-xs uppercase tracking-widest text-muted-foreground">{t("Service")}</th>
+                          <th className="p-4 font-bold text-xs uppercase tracking-widest text-muted-foreground">{t("Date & Time")}</th>
+                          <th className="p-4 font-bold text-xs uppercase tracking-widest text-muted-foreground">{t("Status")}</th>
+                          <th className="p-4 text-right font-bold text-xs uppercase tracking-widest text-muted-foreground">{t("Action")}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {isLoading ? <tr><td colSpan={5} className="py-10"><LoadingState /></td></tr> : filteredBookings.map((b) => (
+                          <tr key={b.id} className="border-b border-[#ff6b35]/5 hover:bg-[#ff6b35]/5 transition-colors group">
+                            <td className="p-4"><p className="font-bold text-sm">{b.full_name}</p><p className="text-xs text-muted-foreground">{b.email}</p></td>
+                            <td className="p-4"><span className="px-2 py-1 rounded-md bg-[#ff6b35]/10 text-[#ff6b35] text-[10px] font-bold uppercase">{t(b.service_type)}</span></td>
+                            <td className="p-4"><p className="text-sm font-medium">{b.booking_date}</p><p className="text-xs text-muted-foreground">{b.booking_time}</p></td>
+                            <td className="p-4"><span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${b.payment_status === 'completed' ? 'bg-green-500/10 text-green-500' : 'bg-amber-500/10 text-amber-500'}`}>{t(b.payment_status)}</span></td>
+                            <td className="p-4 text-right">
+                              <div className="flex justify-end gap-2">
+                                <Button variant="outline" size="sm" className="border-[#ff6b35]/20 text-[#ff6b35] hover:bg-[#ff6b35]/10" onClick={() => setSelectedBooking(b)}>{t("View Details")}</Button>
+                                <Button variant="ghost" size="icon" className="text-[#ff6b35] md:opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => handleSendRescheduleEmail(b)}><Mail className="w-4 h-4" /></Button>
+                                <Button variant="ghost" size="icon" className="text-red-500 md:opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => setDeleteConfirmation({ table: 'bookings', id: b.id })}><Trash2 className="w-4 h-4" /></Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div className="md:hidden space-y-4">
+                    {isLoading ? <LoadingState /> : filteredBookings.map((b) => (
+                      <div key={b.id} className={`p-4 rounded-xl border ${isDark ? 'bg-white/5 border-white/10' : 'bg-[#fcfaf7] border-[#ff6b35]/10'} space-y-3`}>
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <p className="font-bold text-sm">{b.full_name}</p>
+                            <p className="text-xs text-muted-foreground">{b.email}</p>
+                          </div>
+                          <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold uppercase ${b.payment_status === 'completed' ? 'bg-green-500/10 text-green-500' : 'bg-amber-500/10 text-amber-500'}`}>{t(b.payment_status)}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-xs">
+                          <div>
+                            <p className="text-muted-foreground uppercase text-[10px] font-bold tracking-widest mb-1">{t("Service")}</p>
+                            <span className="px-2 py-1 rounded-md bg-[#ff6b35]/10 text-[#ff6b35] font-bold uppercase text-[9px]">{t(b.service_type)}</span>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-muted-foreground uppercase text-[10px] font-bold tracking-widest mb-1">{t("Date & Time")}</p>
+                            <p className="font-medium">{b.booking_date}</p>
+                            <p className="text-muted-foreground">{b.booking_time}</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-2 pt-2">
+                          <Button variant="outline" size="sm" className="flex-1 h-9 text-xs border-[#ff6b35]/20 text-[#ff6b35]" onClick={() => setSelectedBooking(b)}>{t("Details")}</Button>
+                          <Button variant="outline" size="icon" className="h-9 w-9 text-[#ff6b35]" onClick={() => handleSendRescheduleEmail(b)}><Mail className="w-4 h-4" /></Button>
+                          <Button variant="outline" size="icon" className="h-9 w-9 text-red-500" onClick={() => handleDeleteRecord('bookings', b.id)}><Trash2 className="w-4 h-4" /></Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+          {activeTab === "enquiries" && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+              {isLoading ? <LoadingState /> : filteredEnquiries.length > 0 ? filteredEnquiries.map((e) => (
+                <Card key={e.id} className={`${isDark ? 'bg-[#12121a] border-[#ff6b35]/10' : 'bg-white border-[#ff6b35]/20'} hover:border-[#ff6b35]/40 transition-all group`}>
+                    <CardHeader className="pb-2">
+                      <div className="flex justify-between items-start">
+                        <div className="p-2 rounded-lg bg-[#ff6b35]/10 text-[#ff6b35]"><MessageSquare className="w-4 h-4" /></div>
+                        <div className="flex gap-1">
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-[#ff6b35] md:opacity-0 group-hover:opacity-100" onClick={() => setSelectedEnquiry(e)}><Eye className="w-4 h-4" /></Button>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 md:opacity-0 group-hover:opacity-100" onClick={() => handleDeleteRecord('enquiries', e.id)}><Trash2 className="w-4 h-4" /></Button>
+                        </div>
+                      </div>
+
+                    <CardTitle className="text-lg mt-2 font-bold">{e.subject || t("No Subject")}</CardTitle>
+                    <CardDescription className="flex items-center gap-2"><Clock className="w-3 h-3" /> {new Date(e.created_at).toLocaleDateString()}</CardDescription>
+                  </CardHeader>
+                  <CardContent><p className="text-sm italic mb-4 line-clamp-3">"{e.message}"</p><div className="space-y-2 pt-4 border-t border-[#ff6b35]/10"><p className="text-xs font-bold flex items-center gap-2 text-muted-foreground"><Users className="w-3 h-3" /> {e.name}</p><p className="text-xs font-bold flex items-center gap-2 text-muted-foreground"><Mail className="w-3 h-3" /> {e.email}</p></div></CardContent>
+                </Card>
+              )) : <EmptyState message={t("No enquiries yet.")} />}
+            </div>
+          )}
+
+          {activeTab === "users" && (
+            <Card className={isDark ? 'bg-[#12121a] border-[#ff6b35]/10' : 'bg-white border-[#ff6b35]/20'}>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div><CardTitle className="font-[family-name:var(--font-cinzel)] text-[#ff6b35]">{t("User Management")}</CardTitle><CardDescription>{t("Registered users and their activity")}</CardDescription></div>
+              </CardHeader>
+              <CardContent>
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-[#ff6b35]/10">
+                        <th className="p-4 font-bold text-xs uppercase tracking-widest text-muted-foreground">{t("User")}</th>
+                        <th className="p-4 font-bold text-xs uppercase tracking-widest text-muted-foreground">{t("Phone")}</th>
+                        <th className="p-4 font-bold text-xs uppercase tracking-widest text-muted-foreground">{t("Joined")}</th>
+                        <th className="p-4 text-right font-bold text-xs uppercase tracking-widest text-muted-foreground">{t("Action")}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {isLoading ? <tr><td colSpan={4} className="py-10"><LoadingState /></td></tr> : filteredUsers.map((u) => (
+                        <tr key={u.id} className="border-b border-[#ff6b35]/5 hover:bg-[#ff6b35]/5 transition-colors group">
+                          <td className="p-4"><p className="font-bold text-sm">{u.full_name}</p><p className="text-xs text-muted-foreground">{u.email}</p></td>
+                          <td className="p-4 text-sm font-medium">{u.phone}</td>
+                          <td className="p-4 text-xs text-muted-foreground">{new Date(u.created_at).toLocaleDateString()}</td>
+                          <td className="p-4 text-right">
+                            <div className="flex justify-end gap-2">
+                              <Button variant="outline" size="sm" className="border-[#ff6b35]/20 text-[#ff6b35] hover:bg-[#ff6b35]/10" onClick={() => setSelectedUser(u)}>{t("View Details")}</Button>
+                              <Button variant="ghost" size="icon" className="text-blue-500 md:opacity-0 group-hover:opacity-100 transition-opacity" title={t("Reset Password")} onClick={() => handleResetUserPassword(u.email)}><KeyRound className="w-4 h-4" /></Button>
+                              <Button variant="ghost" size="icon" className="text-red-500 md:opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => handleDeleteRecord('user_registrations', u.id)}><Trash2 className="w-4 h-4" /></Button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="md:hidden space-y-4">
+                  {isLoading ? <LoadingState /> : filteredUsers.map((u) => (
+                    <div key={u.id} className={`p-4 rounded-xl border ${isDark ? 'bg-white/5 border-white/10' : 'bg-[#fcfaf7] border-[#ff6b35]/10'} space-y-3`}>
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-bold text-sm">{u.full_name}</p>
+                          <p className="text-xs text-muted-foreground">{u.email}</p>
+                        </div>
+                        <span className="px-2 py-0.5 rounded-full bg-green-500/10 text-green-500 text-[8px] font-bold uppercase">{t("Active")}</span>
+                      </div>
+                      <div className="flex justify-between items-center text-xs">
+                        <div>
+                          <p className="text-muted-foreground uppercase text-[10px] font-bold tracking-widest mb-1">{t("Phone")}</p>
+                          <p className="font-medium">{u.phone}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-muted-foreground uppercase text-[10px] font-bold tracking-widest mb-1">{t("Joined")}</p>
+                          <p className="font-medium">{new Date(u.created_at).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 pt-2">
+                        <Button variant="outline" size="sm" className="flex-1 h-9 text-xs border-[#ff6b35]/20 text-[#ff6b35]" onClick={() => setSelectedUser(u)}>{t("Details")}</Button>
+                        <Button variant="outline" size="icon" className="h-9 w-9 text-blue-500" onClick={() => handleResetUserPassword(u.email)}><KeyRound className="w-4 h-4" /></Button>
+                        <Button variant="outline" size="icon" className="h-9 w-9 text-red-500" onClick={() => handleDeleteRecord('user_registrations', u.id)}><Trash2 className="w-4 h-4" /></Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {activeTab === "resets" && (
+            <Card className={isDark ? 'bg-[#12121a] border-[#ff6b35]/10' : 'bg-white border-[#ff6b35]/20'}>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div><CardTitle className="font-[family-name:var(--font-cinzel)] text-[#ff6b35]">{t("Reset Requests")}</CardTitle><CardDescription>{t("Manage password reset requests from users")}</CardDescription></div>
+              </CardHeader>
+              <CardContent>
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-[#ff6b35]/10">
+                        <th className="p-4 font-bold text-xs uppercase tracking-widest text-muted-foreground">{t("Email")}</th>
+                        <th className="p-4 font-bold text-xs uppercase tracking-widest text-muted-foreground">{t("Phone")}</th>
+                        <th className="p-4 font-bold text-xs uppercase tracking-widest text-muted-foreground">{t("Status")}</th>
+                        <th className="p-4 font-bold text-xs uppercase tracking-widest text-muted-foreground">{t("Date")}</th>
+                        <th className="p-4 text-right font-bold text-xs uppercase tracking-widest text-muted-foreground">{t("Action")}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {isLoading ? <tr><td colSpan={5} className="py-10"><LoadingState /></td></tr> : filteredResetRequests.length > 0 ? filteredResetRequests.map((r) => (
+                        <tr key={r.id} className="border-b border-[#ff6b35]/5 hover:bg-[#ff6b35]/5 transition-colors group">
+                          <td className="p-4"><p className="font-bold text-sm">{r.email}</p></td>
+                          <td className="p-4 text-sm font-medium">{r.phone || "—"}</td>
+                          <td className="p-4"><span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${r.status === 'completed' ? 'bg-green-500/10 text-green-500' : 'bg-amber-500/10 text-amber-500'}`}>{t(r.status)}</span></td>
+                          <td className="p-4 text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString()}</td>
+                          <td className="p-4 text-right">
+                            <div className="flex justify-end gap-2">
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="border-[#ff6b35]/20 text-[#ff6b35] hover:bg-[#ff6b35]/10" 
+                                onClick={() => handleResetUserPassword(r.email)}
+                                disabled={isActionLoading}
+                              >
+                                {t("Send Reset Link")}
+                              </Button>
+                              <Button variant="ghost" size="icon" className="text-red-500 md:opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => handleDeleteRecord('password_reset_requests', r.id)}><Trash2 className="w-4 h-4" /></Button>
+                            </div>
+                          </td>
+                        </tr>
+                      )) : <tr><td colSpan={5} className="py-10 text-center text-muted-foreground italic">{t("No reset requests found.")}</td></tr>}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="md:hidden space-y-4">
+                  {isLoading ? <LoadingState /> : filteredResetRequests.length > 0 ? filteredResetRequests.map((r) => (
+                    <div key={r.id} className={`p-4 rounded-xl border ${isDark ? 'bg-white/5 border-white/10' : 'bg-[#fcfaf7] border-[#ff6b35]/10'} space-y-3`}>
+                      <div className="flex justify-between items-start">
+                        <p className="font-bold text-sm">{r.email}</p>
+                        <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold uppercase ${r.status === 'completed' ? 'bg-green-500/10 text-green-500' : 'bg-amber-500/10 text-amber-500'}`}>{t(r.status)}</span>
+                      </div>
+                      <div className="flex justify-between items-center text-xs">
+                        <div>
+                          <p className="text-muted-foreground uppercase text-[10px] font-bold tracking-widest mb-1">{t("Phone")}</p>
+                          <p className="font-medium">{r.phone || "—"}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-muted-foreground uppercase text-[10px] font-bold tracking-widest mb-1">{t("Requested")}</p>
+                          <p className="font-medium">{new Date(r.created_at).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 pt-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="flex-1 h-9 text-xs border-[#ff6b35]/20 text-[#ff6b35]" 
+                          onClick={() => handleResetUserPassword(r.email)}
+                          disabled={isActionLoading}
+                        >
+                          {t("Send Reset Link")}
+                        </Button>
+                        <Button variant="outline" size="icon" className="h-9 w-9 text-red-500" onClick={() => handleDeleteRecord('password_reset_requests', r.id)}><Trash2 className="w-4 h-4" /></Button>
+                      </div>
+                    </div>
+                  )) : <div className="py-10 text-center text-muted-foreground italic">{t("No reset requests found.")}</div>}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {activeTab === "availability" && (
+            <div className="space-y-6">
+              <div className="flex flex-col gap-2">
+                <h2 className="text-2xl font-bold font-[family-name:var(--font-cinzel)] text-[#ff6b35]">{t("Availability & Schedule")}</h2>
+                <p className="text-muted-foreground">{t("Monitor daily appointments and manage blocked dates.")}</p>
+              </div>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Date Selection and Booking List */}
+                <Card className={`lg:col-span-2 ${isDark ? 'bg-[#12121a] border-[#ff6b35]/10' : 'bg-white border-[#ff6b35]/20'}`}>
+                  <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
+                    <div>
+                      <CardTitle className="text-[#ff6b35]">{t("Daily Bookings")}</CardTitle>
+                      <CardDescription>{t("Select a date to view all consultations for that day")}</CardDescription>
+                    </div>
+                    <div className="w-full sm:w-48">
+                      <Input 
+                        type="date" 
+                        value={availabilityFilterDate} 
+                        onChange={(e) => setAvailabilityFilterDate(e.target.value)} 
+                        className={isDark ? 'bg-[#1a1a2e] border-[#ff6b35]/20' : 'bg-white border-[#ff6b35]/30'}
+                      />
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4 min-h-[300px]">
+                      {!availabilityFilterDate ? (
+                        <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+                          <Calendar className="w-12 h-12 mb-4 opacity-20" />
+                          <p className="font-bold text-center px-4">{t("Please select a date to view bookings")}</p>
+                        </div>
+                      ) : filteredBookingsByDate.length > 0 ? (
+                        <div className="grid grid-cols-1 gap-4 text-left">
+                          {filteredBookingsByDate.map((b) => (
+                            <motion.div 
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              key={b.id} 
+                              className={`p-4 md:p-6 rounded-2xl border ${isDark ? 'bg-[#1a1a2e]/50 border-[#ff6b35]/10' : 'bg-[#fcfaf7] border-[#ff6b35]/20'} hover:border-[#ff6b35]/40 transition-all shadow-sm hover:shadow-md`}
+                            >
+                              <div className="flex flex-wrap justify-between items-start gap-4 mb-6">
+                                <div className="flex items-center gap-4">
+                                  <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-gradient-to-br from-[#ff6b35] to-[#ff8c5e] flex items-center justify-center text-white font-black text-xl md:text-2xl shadow-lg shadow-[#ff6b35]/20">
+                                    {b.full_name.charAt(0)}
+                                  </div>
+                                  <div>
+                                    <p className="font-bold text-lg md:text-xl tracking-tight">{b.full_name}</p>
+                                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 mt-1">
+                                      <p className="text-[11px] md:text-xs text-muted-foreground flex items-center gap-1.5"><Mail className="w-3.5 h-3.5 text-[#ff6b35]" /> {b.email}</p>
+                                      <p className="text-[11px] md:text-xs text-muted-foreground flex items-center gap-1.5"><Phone className="w-3.5 h-3.5 text-[#ff6b35]" /> {b.phone}</p>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+                                  <Button 
+                                    className="flex-1 sm:flex-none bg-[#ff6b35] hover:bg-[#ff6b35]/90 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-lg shadow-[#ff6b35]/20 transition-all hover:scale-105 active:scale-95"
+                                    onClick={() => handleSendRescheduleEmail(b)}
+                                  >
+                                    <Mail className="w-3.5 h-3.5 mr-2" /> {t("Reschedule Email")}
+                                  </Button>
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm" 
+                                    className="flex-1 sm:flex-none border-[#ff6b35]/20 text-[#ff6b35] hover:bg-[#ff6b35]/5 font-bold rounded-xl"
+                                    onClick={() => setSelectedBooking(b)}
+                                  >
+                                    <Eye className="w-3.5 h-3.5 mr-2" /> {t("Details")}
+                                  </Button>
+                                </div>
+                              </div>
+
+                                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+                                  <div className={`p-3 md:p-4 rounded-xl border ${isDark ? 'bg-white/5 border-white/10' : 'bg-white border-[#ff6b35]/10'}`}>
+                                    <p className="text-[9px] md:text-[10px] uppercase font-black tracking-widest text-muted-foreground mb-2 flex items-center gap-2">
+                                      <Clock className="w-3.5 h-3.5" /> {t("Time")}
+                                    </p>
+                                    <p className="font-bold text-xs md:text-sm truncate">{b.booking_time}</p>
+                                    <p className="text-[9px] md:text-[10px] text-[#ff6b35] font-bold mt-1">+ 1 Hr {t("Buffer")}</p>
+                                  </div>
+                                  <DetailBox label={t("Service")} value={t(b.service_type)} icon={<Star className="w-3.5 h-3.5" />} />
+                                  <DetailBox label={t("Payment")} value={`₹${b.amount}`} icon={<CreditCard className="w-3.5 h-3.5" />} />
+                                  <DetailBox label={t("Status")} value={t(b.payment_status)} icon={<CheckCircle2 className="w-3.5 h-3.5" />} isStatus />
+                                </div>
+
+                              <div className="mt-6 pt-6 border-t border-[#ff6b35]/10 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div className={`p-3 rounded-xl ${isDark ? 'bg-white/5' : 'bg-white border border-[#ff6b35]/10'}`}>
+                                  <p className="text-[9px] md:text-[10px] text-muted-foreground uppercase font-black tracking-widest mb-1">{t("Date of Birth")}</p>
+                                  <p className="text-xs md:text-sm font-bold">{b.date_of_birth || "—"}</p>
+                                </div>
+                                <div className={`p-3 rounded-xl ${isDark ? 'bg-white/5' : 'bg-white border border-[#ff6b35]/10'}`}>
+                                  <p className="text-[9px] md:text-[10px] text-muted-foreground uppercase font-black tracking-widest mb-1">{t("Time of Birth")}</p>
+                                  <p className="text-xs md:text-sm font-bold">{b.time_of_birth || "—"}</p>
+                                </div>
+                                <div className={`p-3 rounded-xl ${isDark ? 'bg-white/5' : 'bg-white border border-[#ff6b35]/10'}`}>
+                                  <p className="text-[9px] md:text-[10px] text-muted-foreground uppercase font-black tracking-widest mb-1">{t("Place of Birth")}</p>
+                                  <p className="text-xs md:text-sm font-bold line-clamp-1">{b.place_of_birth || "—"}</p>
+                                </div>
+                              </div>
+                            </motion.div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+                          <CheckCircle2 className="w-12 h-12 mb-4 text-green-500/50" />
+                          <p className="font-bold text-center px-4">{t("No bookings found for this date")}</p>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Blocking Panel */}
+                <div className="space-y-6">
+                  <Card className={isDark ? 'bg-[#12121a] border-[#ff6b35]/10' : 'bg-white border-[#ff6b35]/20'}>
+                    <CardHeader><CardTitle className="text-[#ff6b35] flex items-center gap-2"><Calendar className="w-5 h-5" /> {t("Block Date")}</CardTitle></CardHeader>
+                    <CardContent>
+                      <form onSubmit={handleBlockDate} className="space-y-4 text-left">
+                        <div className="space-y-2"><Label>{t("Date")}</Label><Input type="date" value={newBlockedDate.date} onChange={(e) => setNewBlockedDate({...newBlockedDate, date: e.target.value})} required className={isDark ? 'bg-[#1a1a2e] border-[#ff6b35]/10' : 'bg-white border-[#ff6b35]/20'} /></div>
+                        <div className="space-y-2"><Label>{t("Reason")}</Label><Input placeholder={t("Holiday/Busy")} value={newBlockedDate.reason} onChange={(e) => setNewBlockedDate({...newBlockedDate, reason: e.target.value})} required className={isDark ? 'bg-[#1a1a2e] border-[#ff6b35]/10' : 'bg-white border-[#ff6b35]/20'} /></div>
+                        <Button type="submit" className="w-full bg-[#ff6b35] hover:bg-[#ff6b35]/90 text-white font-bold" disabled={isActionLoading}>
+                          {isActionLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Plus className="w-4 h-4 mr-2" />} {t("Block Date")}
+                        </Button>
+                      </form>
+                    </CardContent>
+                  </Card>
+
+                  <Card className={isDark ? 'bg-[#12121a] border-[#ff6b35]/10' : 'bg-white border-[#ff6b35]/20'}>
+                    <CardHeader><CardTitle className="text-[#ff6b35]">{t("Blocked Dates")}</CardTitle></CardHeader>
+                    <CardContent className="space-y-3 max-h-[400px] overflow-y-auto pr-2 text-left">
+                      {blockedDates.length > 0 ? blockedDates.map((item) => (
+                        <div key={item.id} className={`p-4 rounded-xl border flex items-center justify-between ${isDark ? 'bg-[#1a1a2e]/50 border-[#ff6b35]/10' : 'bg-[#fcfaf7] border-[#ff6b35]/20'}`}>
+                          <div><p className="font-bold text-sm">{new Date(item.date).toLocaleDateString()}</p><p className="text-xs text-muted-foreground italic">{item.reason}</p></div>
+                          <Button variant="ghost" size="icon" className="text-red-500" onClick={() => handleUnblockDate(item.id)} disabled={isActionLoading}><Trash2 className="w-4 h-4" /></Button>
+                        </div>
+                      )) : <p className="text-center text-xs text-muted-foreground py-4">{t("No dates currently blocked")}</p>}
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "feedback" && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+              {feedbacks.length > 0 ? feedbacks.map((f) => (
+                <Card key={f.id} className={isDark ? 'bg-[#12121a] border-[#ff6b35]/10' : 'bg-white border-[#ff6b35]/20'}>
+                  <CardHeader>
+                    <div className="flex justify-between items-start">
+                      <div className="flex gap-1">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <Star key={i} className={`w-3 h-3 ${i < f.rating ? 'fill-[#ff6b35] text-[#ff6b35]' : 'text-muted-foreground'}`} />
+                        ))}
+                      </div>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500" onClick={() => handleDeleteRecord('feedback', f.id)}><Trash2 className="w-4 h-4" /></Button>
+                    </div>
+                    <CardTitle className="text-sm mt-2 font-bold text-left">{f.name}</CardTitle>
+                  </CardHeader>
+                  <CardContent><p className="text-xs italic text-muted-foreground leading-relaxed text-left">"{f.message}"</p></CardContent>
+                </Card>
+              )) : <EmptyState message={t("No feedback received yet.")} />}
+            </div>
+          )}
+
+          {activeTab === "settings" && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-20 md:pb-0">
+              <Card className={isDark ? 'bg-[#12121a] border-[#ff6b35]/10' : 'bg-white border-[#ff6b35]/20'}>
+                <CardHeader><CardTitle className="text-[#ff6b35] flex items-center gap-2"><Bot className="w-6 h-6" /> {t("Bot Settings")}</CardTitle></CardHeader>
+                <CardContent>
+                  <form onSubmit={handleUpdateSettings} className="space-y-4 text-left">
+                    <div className="space-y-2"><Label>{t("Admin Email")}</Label><Input type="email" value={adminSettings.email} onChange={(e) => setAdminSettings({...adminSettings, email: e.target.value})} className={isDark ? 'bg-[#1a1a2e] border-[#ff6b35]/10' : 'bg-white border-[#ff6b35]/20'} /></div>
+                    <div className="space-y-2"><Label>{t("Bot Token")}</Label><Input type="password" value={adminSettings.botToken} onChange={(e) => setAdminSettings({...adminSettings, botToken: e.target.value})} className={isDark ? 'bg-[#1a1a2e] border-[#ff6b35]/10' : 'bg-white border-[#ff6b35]/20'} /></div>
+                    <div className="space-y-2"><Label>{t("Chat ID")}</Label><Input value={adminSettings.chatId} onChange={(e) => setAdminSettings({...adminSettings, chatId: e.target.value})} className={isDark ? 'bg-[#1a1a2e] border-[#ff6b35]/10' : 'bg-white border-[#ff6b35]/20'} /></div>
+                    <Button type="submit" className="w-full bg-[#ff6b35] font-bold" disabled={isActionLoading}>{t("Save Configuration")}</Button>
+                  </form>
+                </CardContent>
+              </Card>
+              <Card className={isDark ? 'bg-[#12121a] border-[#ff6b35]/10' : 'bg-white border-[#ff6b35]/20'}>
+                <CardHeader><CardTitle className="text-[#ff6b35] flex items-center gap-2"><Lock className="w-6 h-6" /> {t("Security")}</CardTitle></CardHeader>
+                <CardContent>
+                  <form onSubmit={handleUpdatePassword} className="space-y-4 text-left">
+                    <div className="space-y-2"><Label>{t("Current Password")}</Label><Input type="password" value={passwords.current} onChange={(e) => setPasswords({...passwords, current: e.target.value})} className={isDark ? 'bg-[#1a1a2e] border-[#ff6b35]/10' : 'bg-white border-[#ff6b35]/20'} /></div>
+                    <div className="space-y-2"><Label>{t("New Password")}</Label><Input type="password" value={passwords.new} onChange={(e) => setPasswords({...passwords, new: e.target.value})} className={isDark ? 'bg-[#1a1a2e] border-[#ff6b35]/10' : 'bg-white border-[#ff6b35]/20'} /></div>
+                    <Button type="submit" className="w-full bg-[#ff6b35] font-bold" disabled={isActionLoading}>{t("Update Password")}</Button>
+                  </form>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+        </div>
+      </main>
+
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {deleteConfirmation && (
+          <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setDeleteConfirmation(null)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className={`relative w-full max-w-sm rounded-2xl shadow-2xl border p-6 ${isDark ? 'bg-[#1a1a2e] border-[#ff6b35]/20' : 'bg-white border-[#ff6b35]/20'}`}
+            >
+              <div className="flex flex-col items-center text-center space-y-4">
+                <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center text-red-500">
+                  <AlertTriangle className="w-8 h-8" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-red-500">{t("Are you sure?")}</h3>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    {t("This action cannot be undone. This record will be permanently deleted.")}
+                  </p>
+                </div>
+                <div className="grid grid-cols-2 gap-3 w-full pt-2">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setDeleteConfirmation(null)}
+                    disabled={isActionLoading}
+                    className="rounded-xl font-bold"
+                  >
+                    {t("Cancel")}
+                  </Button>
+                  <Button 
+                    variant="destructive" 
+                    onClick={() => handleDeleteRecord(deleteConfirmation.table, deleteConfirmation.id)}
+                    disabled={isActionLoading}
+                    className="rounded-xl font-bold bg-red-500 hover:bg-red-600"
+                  >
+                    {isActionLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Trash2 className="w-4 h-4 mr-2" />}
+                    {t("Delete")}
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* User Details Modal */}
+      <AnimatePresence>
+        {selectedUser && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedUser(null)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className={`relative w-full max-w-lg rounded-2xl shadow-2xl border overflow-hidden ${isDark ? 'bg-[#1a1a2e] border-[#ff6b35]/20' : 'bg-white border-[#ff6b35]/20'}`}
+            >
+              <div className="h-24 bg-[#ff6b35] flex items-end p-6 relative">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={() => setSelectedUser(null)} 
+                  className="absolute top-4 right-4 text-white hover:bg-white/20"
+                >
+                  ×
+                </Button>
+                <div className="w-20 h-20 rounded-2xl bg-white shadow-xl border-4 border-white flex items-center justify-center text-4xl font-black text-[#ff6b35] absolute -bottom-10">
+                  {selectedUser.full_name.charAt(0)}
+                </div>
+              </div>
+              <div className="pt-14 p-6 space-y-6 text-left">
+                <div>
+                  <h2 className="text-2xl font-bold">{selectedUser.full_name}</h2>
+                  <p className="text-muted-foreground">{selectedUser.email}</p>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className={`p-4 rounded-xl border ${isDark ? 'bg-white/5 border-white/10' : 'bg-[#ff6b35]/5 border-[#ff6b35]/10'}`}>
+                    <p className="text-[10px] uppercase font-black tracking-widest text-muted-foreground mb-1">{t("Phone Number")}</p>
+                    <p className="font-bold flex items-center gap-2"><Phone className="w-4 h-4 text-[#ff6b35]" /> {selectedUser.phone}</p>
+                  </div>
+                  <div className={`p-4 rounded-xl border ${isDark ? 'bg-white/5 border-white/10' : 'bg-[#ff6b35]/5 border-[#ff6b35]/10'}`}>
+                    <p className="text-[10px] uppercase font-black tracking-widest text-muted-foreground mb-1">{t("Joined")}</p>
+                    <p className="font-bold flex items-center gap-2"><Calendar className="w-4 h-4 text-[#ff6b35]" /> {new Date(selectedUser.created_at).toLocaleDateString()}</p>
+                  </div>
+                </div>
+                
+                <div className={`p-4 md:p-6 rounded-2xl border ${isDark ? 'bg-white/5 border-white/10' : 'bg-[#fcfaf7] border-[#ff6b35]/10'}`}>
+                  <h3 className="text-sm font-bold mb-4 flex items-center gap-2 text-[#ff6b35]"><Clock className="w-4 h-4" /> {t("Activity History")}</h3>
+                  <div className="space-y-6">
+                    <div>
+                      <p className="text-[10px] uppercase font-black text-muted-foreground mb-2">{t("Bookings")}</p>
+                      <div className="space-y-2">
+                        {bookings.filter(b => b.email === selectedUser.email).length > 0 ? (
+                          bookings.filter(b => b.email === selectedUser.email).map((b) => (
+                            <div key={b.id} className="flex justify-between items-center text-[10px] md:text-xs p-2 rounded-lg hover:bg-[#ff6b35]/5 transition-colors border border-transparent hover:border-[#ff6b35]/10">
+                              <div className="min-w-0 flex-1 mr-2">
+                                <p className="font-bold truncate">{t(b.service_type)}</p>
+                                <p className="text-muted-foreground">{b.booking_date} @ {b.booking_time}</p>
+                              </div>
+                              <span className={`px-2 py-0.5 rounded-full font-bold uppercase text-[8px] whitespace-nowrap ${b.payment_status === 'completed' ? 'bg-green-500/10 text-green-500' : 'bg-amber-500/10 text-amber-500'}`}>{t(b.payment_status)}</span>
+                            </div>
+                          ))
+                        ) : (
+                          <p className="text-xs text-muted-foreground italic">{t("No appointments scheduled yet.")}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="pt-4 border-t border-[#ff6b35]/10">
+                      <p className="text-[10px] uppercase font-black text-muted-foreground mb-2">{t("Enquiries")}</p>
+                      <div className="space-y-2">
+                        {enquiries.filter(e => e.email === selectedUser.email).length > 0 ? (
+                          enquiries.filter(e => e.email === selectedUser.email).map((e) => (
+                            <div key={e.id} className="p-2 rounded-lg bg-white/5 border border-[#ff6b35]/5">
+                              <p className="text-[10px] font-bold text-[#ff6b35]">{e.subject || t('General Inquiry')}</p>
+                              <p className="text-[10px] text-muted-foreground line-clamp-1 italic">"{e.message}"</p>
+                            </div>
+                          ))
+                        ) : (
+                          <p className="text-xs text-muted-foreground italic">{t("No enquiries yet.")}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Button className="w-full bg-[#ff6b35] hover:bg-[#ff6b35]/90 text-white font-bold h-12 rounded-xl" onClick={() => handleResetUserPassword(selectedUser.email)}>
+                    <KeyRound className="w-4 h-4 mr-2" /> {t("Send Reset Email")}
+                  </Button>
+                  <Button variant="outline" className="w-full border-[#ff6b35] text-[#ff6b35] font-bold h-12 rounded-xl" onClick={() => setSelectedUser(null)}>
+                    {t("Close Profile")}
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Booking Details Modal */}
+      <AnimatePresence>
+        {selectedBooking && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedBooking(null)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className={`relative w-full max-w-2xl rounded-2xl shadow-2xl border overflow-hidden ${isDark ? 'bg-[#1a1a2e] border-[#ff6b35]/20' : 'bg-white border-[#ff6b35]/20'}`}
+            >
+              <div className="p-4 md:p-6 border-b border-[#ff6b35]/10 flex justify-between items-center bg-[#ff6b35]/5">
+                <h2 className="text-lg md:text-xl font-bold font-[family-name:var(--font-cinzel)] text-[#ff6b35]">{t("Booking Details")}</h2>
+                <Button variant="ghost" size="icon" onClick={() => setSelectedBooking(null)}>×</Button>
+              </div>
+              <div className="p-4 md:p-6 overflow-y-auto max-h-[80vh] space-y-8 text-left">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <h3 className="text-xs font-black uppercase tracking-widest text-muted-foreground">{t("Client Information")}</h3>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3"><Users className="w-4 h-4 text-[#ff6b35]" /><span className="text-sm font-bold">{selectedBooking.full_name}</span></div>
+                      <div className="flex items-center gap-3"><Mail className="w-4 h-4 text-[#ff6b35]" /><span className="text-sm truncate">{selectedBooking.email}</span></div>
+                      <div className="flex items-center gap-3"><Phone className="w-4 h-4 text-[#ff6b35]" /><span className="text-sm">{selectedBooking.phone}</span></div>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <h3 className="text-xs font-black uppercase tracking-widest text-muted-foreground">{t("Appointment Details")}</h3>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3"><Star className="w-4 h-4 text-[#ff6b35]" /><span className="text-sm font-bold">{t(selectedBooking.service_type)}</span></div>
+                      <div className="flex items-center gap-3"><Calendar className="w-4 h-4 text-[#ff6b35]" /><span className="text-sm">{selectedBooking.booking_date}</span></div>
+                      <div className="flex items-center gap-3"><Clock className="w-4 h-4 text-[#ff6b35]" /><span className="text-sm">{selectedBooking.booking_time}</span></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className={`p-4 md:p-6 rounded-2xl border ${isDark ? 'bg-white/5 border-white/10' : 'bg-[#ff6b35]/5 border-[#ff6b35]/10'}`}>
+                  <h3 className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-4">{t("Birth Chart Details")}</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="p-3 rounded-lg bg-background/50 border border-border">
+                      <p className="text-[10px] text-muted-foreground mb-1">{t("Date of Birth")}</p>
+                      <p className="font-bold text-sm">{selectedBooking.date_of_birth || t("Not provided")}</p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-background/50 border border-border">
+                      <p className="text-[10px] text-muted-foreground mb-1">{t("Time of Birth")}</p>
+                      <p className="font-bold text-sm">{selectedBooking.time_of_birth || t("Not provided")}</p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-background/50 border border-border">
+                      <p className="text-[10px] text-muted-foreground mb-1">{t("Place of Birth")}</p>
+                      <p className="font-bold text-sm">{selectedBooking.place_of_birth || t("Not provided")}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex-1 p-4 rounded-xl border border-green-500/20 bg-green-500/5">
+                    <p className="text-[10px] text-green-500 font-bold uppercase mb-1">{t("Payment Status")}</p>
+                    <p className="text-lg font-black uppercase">{t(selectedBooking.payment_status)}</p>
+                  </div>
+                  <div className="flex-1 p-4 rounded-xl border border-[#ff6b35]/20 bg-[#ff6b35]/5">
+                    <p className="text-[10px] text-[#ff6b35] font-bold uppercase mb-1">{t("Amount")}</p>
+                    <p className="text-lg font-black">₹{selectedBooking.amount}</p>
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Button className="flex-1 bg-[#ff6b35] hover:bg-[#ff6b35]/90 text-white font-bold h-12" onClick={() => handleSendRescheduleEmail(selectedBooking)}>
+                    <Mail className="w-4 h-4 mr-2" /> {t("Send Reschedule Template")}
+                  </Button>
+                  <Button variant="outline" className="h-12 border-[#ff6b35] text-[#ff6b35] hover:bg-[#ff6b35]/10 font-bold" onClick={() => setSelectedBooking(null)}>
+                    {t("Close")}
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Enquiry Details Modal */}
+      <AnimatePresence>
+        {selectedEnquiry && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedEnquiry(null)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className={`relative w-full max-w-lg rounded-2xl shadow-2xl border overflow-hidden ${isDark ? 'bg-[#1a1a2e] border-[#ff6b35]/20' : 'bg-white border-[#ff6b35]/20'}`}
+            >
+              <div className="p-4 md:p-6 border-b border-[#ff6b35]/10 flex justify-between items-center bg-[#ff6b35]/5">
+                <h2 className="text-lg md:text-xl font-bold font-[family-name:var(--font-cinzel)] text-[#ff6b35]">{t("Enquiry Message")}</h2>
+                <Button variant="ghost" size="icon" onClick={() => setSelectedEnquiry(null)}>×</Button>
+              </div>
+              <div className="p-4 md:p-6 space-y-6 text-left">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-[#ff6b35]/10 flex items-center justify-center text-[#ff6b35] font-bold">
+                    {selectedEnquiry.name.charAt(0)}
+                  </div>
+                  <div>
+                    <h3 className="font-bold">{selectedEnquiry.name}</h3>
+                    <p className="text-xs text-muted-foreground">{selectedEnquiry.email}</p>
+                  </div>
+                </div>
+                
+                <div className={`p-4 rounded-xl ${isDark ? 'bg-white/5' : 'bg-[#fcfaf7] border border-[#ff6b35]/10'}`}>
+                  <p className="text-xs font-black text-[#ff6b35] uppercase mb-2">{t("Subject")}: {selectedEnquiry.subject || t("General Inquiry")}</p>
+                  <p className="text-sm italic leading-relaxed text-muted-foreground">"{selectedEnquiry.message}"</p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Button variant="outline" className="border-[#ff6b35] text-[#ff6b35] hover:bg-[#ff6b35]/10 font-bold" onClick={() => {
+                    const mailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${selectedEnquiry.email}&su=Re: ${selectedEnquiry.subject || 'Enquiry'}`;
+                    window.parent.postMessage({ type: "OPEN_EXTERNAL_URL", data: { url: mailUrl } }, "*");
+                  }}>
+                    <Mail className="w-4 h-4 mr-2" /> {t("Reply via Gmail")}
+                  </Button>
+                  <Button variant="outline" className="border-[#ff6b35] text-[#ff6b35] hover:bg-[#ff6b35]/10 font-bold" onClick={() => setSelectedEnquiry(null)}>
+                    {t("Close")}
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}

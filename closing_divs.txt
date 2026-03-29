@@ -1,0 +1,125 @@
+325:          </div>
+350:          </div>
+351:        </div>
+359:          </div>
+365:          </div>
+373:            </div>
+384:                            <div><p className="text-sm font-medium text-gray-500">Gross Revenue</p><h3 className="text-2xl font-bold mt-1 tracking-tight">₹{formatCurrency(analytics.totalRevenue)}</h3></div>
+385:                            <div className="p-3 bg-green-500/10 rounded-xl"><IndianRupee className="w-6 h-6 text-green-500" /></div>
+386:                          </div>
+392:                            <div><p className="text-sm font-medium text-gray-500">Total Bookings</p><h3 className="text-2xl font-bold mt-1 tracking-tight">{bookings.length}</h3></div>
+393:                            <div className="p-3 bg-[#ff6b35]/10 rounded-xl"><Calendar className="w-6 h-6 text-[#ff6b35]" /></div>
+394:                          </div>
+400:                            <div><p className="text-sm font-medium text-gray-500">Registered Users</p><h3 className="text-2xl font-bold mt-1 tracking-tight">{users.length}</h3></div>
+401:                            <div className="p-3 bg-blue-500/10 rounded-xl"><Users className="w-6 h-6 text-blue-500" /></div>
+402:                          </div>
+408:                            <div><p className="text-sm font-medium text-gray-500">Total Feedback</p><h3 className="text-2xl font-bold mt-1 tracking-tight">{feedbacks.length}</h3></div>
+409:                            <div className="p-3 bg-purple-500/10 rounded-xl"><Star className="w-6 h-6 text-purple-500" /></div>
+410:                          </div>
+413:                    </div>
+431:                          </div>
+432:                        </div>
+435:                  </div>
+449:                      </div>
+454:                      </div>
+455:                    </div>
+463:                        </div>
+475:                                      </div>
+485:                                        </div>
+486:                                      </div>
+487:                                    </div>
+488:                                  </div>
+493:                                        <div className="p-2 rounded-lg bg-gray-500/5 group-hover:bg-[#ff6b35]/10"><Mail className="w-4 h-4" /></div>
+495:                                      </div>
+497:                                        <div className="p-2 rounded-lg bg-gray-500/5 group-hover:bg-[#ff6b35]/10"><Phone className="w-4 h-4" /></div>
+499:                                      </div>
+500:                                    </div>
+503:                                        <div className="p-2 rounded-lg bg-gray-500/5 group-hover:bg-[#ff6b35]/10"><Calendar className="w-4 h-4" /></div>
+505:                                      </div>
+507:                                        <div className="p-2 rounded-lg bg-gray-500/5 group-hover:bg-[#ff6b35]/10"><Clock className="w-4 h-4" /></div>
+509:                                      </div>
+510:                                    </div>
+511:                                  </div>
+517:                                    </div>
+519:                                </div>
+529:                                      </div>
+533:                                      </div>
+534:                                    </div>
+541:                                      </div>
+575:                                      </div>
+576:                                    </div>
+583:                                      </div>
+595:                                          </div>
+625:                                          </div>
+627:                                      </div>
+628:                                    </div>
+629:                                  </div>
+630:                                </div>
+631:                              </div>
+636:                    </div>
+645:                            </div>
+652:                                    <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest opacity-60">New Date</label><Input type="date" value={rescheduleData.date} onChange={(e) => setRescheduleData({...rescheduleData, date: e.target.value})} className={`h-12 rounded-xl ${theme === 'dark' ? 'bg-[#0a0a0f] border-white/10' : 'bg-gray-50 border-gray-200'}`} /></div>
+653:                                    <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest opacity-60">New Time</label><Input type="time" value={rescheduleData.time} onChange={(e) => setRescheduleData({...rescheduleData, time: e.target.value})} className={`h-12 rounded-xl ${theme === 'dark' ? 'bg-[#0a0a0f] border-white/10' : 'bg-gray-50 border-gray-200'}`} /></div>
+654:                                  </div>
+655:                                </div>
+661:                                  </div>
+670:                                  </div>
+671:                                </div>
+672:                              </div>
+682:                                    </div>
+683:                                    <div className="whitespace-pre-wrap py-2">{rescheduleData.customMessage}</div>
+689:                                        </div>
+691:                                    </div>
+692:                                  </div>
+693:                                </div>
+695:                              </div>
+696:                            </div>
+703:                            </div>
+705:                        </div>
+716:                            </div>
+727:                                      </div>
+732:                                      </div>
+733:                                    </div>
+735:                              </div>
+738:                            </div>
+740:                        </div>
+743:                  </div>
+752:                            <div className="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500 font-bold">{u.name ? u.name[0] : 'U'}</div>
+753:                            <div><h4 className="font-bold">{u.name}</h4><p className="text-sm text-gray-500">{u.email}</p></div>
+757:                    </div>
+758:                  </div>
+767:                            <div className="flex items-center justify-between"><div className="flex items-center gap-2 font-bold"><Star className="w-4 h-4 text-yellow-500 fill-yellow-500" /> {f.rating}/5</div><Badge variant={f.is_approved ? "default" : "outline"}>{f.is_approved ? "Approved" : "Pending"}</Badge></div>
+769:                            <div className="text-sm font-medium">— {f.name}</div>
+773:                    </div>
+774:                  </div>
+784:                            <div className="space-y-2"><label className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Date</label><Input type="date" className={`h-12 rounded-xl ${theme === 'dark' ? 'bg-[#0a0a0f] border-[#ff6b35]/20' : 'bg-white border-[#ff6b35]/20'}`} value={newAvailability.date} onChange={(e) => setNewAvailability({ ...newAvailability, date: e.target.value })} /></div>
+802:                                </div>
+803:                              </div>
+804:                            <div className="space-y-2"><label className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Notes (Internal)</label><Input placeholder="e.g. Festival Holiday" className={`h-12 rounded-xl ${theme === 'dark' ? 'bg-[#0a0a0f] border-[#ff6b35]/20' : 'bg-white border-[#ff6b35]/20'}`} value={newAvailability.notes} onChange={(e) => setNewAvailability({ ...newAvailability, notes: e.target.value })} /></div>
+805:                          </div>
+829:                                        </div>
+839:                                          </div>
+840:                                      </div>
+846:                                </div>
+850:                            </div>
+853:                          <div className="flex justify-center pt-8"><Button type="submit" className="bg-[#ff6b35] hover:bg-[#ff8a5d] text-white font-bold h-12 px-12 rounded-xl shadow-lg shadow-[#ff6b35]/20 transition-all hover:scale-[1.02] active:scale-[0.98]">Update Celestial Window</Button></div>
+859:                      {availability.length === 0 ? <div className="col-span-full text-center py-20 bg-white/5 rounded-3xl border border-dashed border-[#ff6b35]/20"><Clock className="w-12 h-12 text-gray-400 mx-auto mb-4" /><h3 className="text-lg font-medium">No special availability rules set</h3><p className="text-gray-500">System is using default business hours</p></div> : 
+863:                              <div className="flex items-center justify-between"><div className="flex items-center gap-2 font-bold"><Calendar className="w-4 h-4 text-[#ff6b35]" /> {a.date}</div><div className="flex items-center gap-2"><Badge variant={a.is_available ? "default" : "destructive"}>{a.is_available ? "Working" : "Busy"}</Badge><Button size="icon" variant="ghost" onClick={() => deleteAvailability(a.date)} className="text-red-500 hover:bg-red-500/10 h-8 w-8"><Trash2 className="w-4 h-4" /></Button></div></div>
+864:                              {a.blocked_times && a.blocked_times.length > 0 && <div className="text-sm text-gray-500">Blocked slots: {a.blocked_times.join(", ")}</div>}
+870:                    </div>
+871:                  </div>
+877:                      {enquiries.length === 0 ? <div className="text-center py-20 bg-white/5 rounded-3xl border border-dashed border-[#ff6b35]/20"><Mail className="w-12 h-12 text-gray-400 mx-auto mb-4" /><h3 className="text-lg font-medium">No enquiries yet</h3></div> : 
+881:                              <div className="space-y-1"><h4 className="font-bold">{e.name}</h4><div className="flex flex-wrap gap-4 text-sm text-gray-500"><span className="flex items-center gap-1"><MailIcon className="w-3 h-3" /> {e.email}</span><span className="flex items-center gap-1"><PhoneIcon className="w-3 h-3" /> {e.phone}</span></div></div>
+882:                              <div className="flex items-center gap-6"><div className="md:text-right"><p className="text-sm font-bold text-[#ff6b35]">{e.subject}</p><p className="text-sm text-gray-500 max-w-md truncate">{e.message}</p></div><Button size="icon" variant="ghost" onClick={() => deleteItem('enquiry', e.id)} className="text-red-500 hover:bg-red-500/10 h-8 w-8"><Trash2 className="w-4 h-4" /></Button></div>
+887:                    </div>
+888:                  </div>
+896:                        <div className="space-y-2"><label className="text-sm font-medium text-gray-500">New Password</label><div className="relative"><Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" /><Input type="password" placeholder="Enter new password" className={`pl-10 h-12 rounded-xl ${theme === 'dark' ? 'bg-[#0a0a0f] border-[#ff6b35]/20' : 'bg-white border-[#ff6b35]/20'}`} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} /></div></div>
+915:                          </div>
+916:                        </div>
+942:                            </div>
+943:                          </div>
+960:                          </div>
+966:                      <CardContent><div className="grid grid-cols-2 gap-4"><div className="p-4 rounded-xl bg-gray-500/5"><p className="text-xs text-gray-500 uppercase font-bold mb-1">Environment</p><p className="font-bold text-green-500">Live</p></div><div className="p-4 rounded-xl bg-gray-500/5"><p className="text-xs text-gray-500 uppercase font-bold mb-1">Last Sync</p><p className="font-bold">{new Date().toLocaleTimeString()}</p></div></div></CardContent>
+968:                  </div>
+975:      </div>
+976:    </div>

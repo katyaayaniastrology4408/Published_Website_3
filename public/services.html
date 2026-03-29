@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>सेवाएं | Katyaayani Astrologer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/render/image/public/project-uploads/c601c1cc-61c8-474d-bbc9-2026bfe37c34/logo_withoutname-removebg-1767251276652.png?width=64&height=64&resize=contain" type="image/png">
+</head>
+<body class="dark">
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loader"></div>
+        <p class="loading-text">लोड हो रहा है...</p>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <img src="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/render/image/public/project-uploads/c601c1cc-61c8-474d-bbc9-2026bfe37c34/logo_withoutname-removebg-1767251276652.png?width=112&height=112&resize=contain" alt="Katyaayani Astrologer" class="logo-img">
+                <span class="logo-text">KATYAAYANI<br>ASTROLOGER</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html">मुखपृष्ठ</a>
+                <a href="services.html" class="active">सेवाएं</a>
+                <a href="booking.html">बुक करें</a>
+                <a href="feedback.html">प्रतिक्रिया</a>
+                <a href="about.html">हमारे बारे में</a>
+            </div>
+            <div class="nav-actions">
+                <button id="theme-toggle" class="theme-btn" aria-label="Toggle theme">
+                    <svg class="icon sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <svg class="icon moon-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
+                <a href="booking.html" class="cta-btn">बुक करें</a>
+            </div>
+            <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+        </div>
+        <div class="mobile-menu hidden" id="mobile-menu">
+            <a href="index.html">मुखपृष्ठ</a>
+            <a href="services.html" class="active">सेवाएं</a>
+            <a href="booking.html">बुक करें</a>
+            <a href="feedback.html">प्रतिक्रिया</a>
+            <a href="about.html">हमारे बारे में</a>
+        </div>
+    </nav>
+
+    <!-- Services Hero -->
+    <section class="hero-section" style="min-height: 60vh; padding-top: 5rem;">
+        <div class="star-field"></div>
+        <div class="hero-overlay"></div>
+        <div style="position:absolute;inset:0;z-index:0;">
+            <img src="https://images.unsplash.com/photo-1436891620584-47fd0e565afb?q=80&w=2000" alt="Stars Cover" style="width:100%;height:100%;object-fit:cover;opacity:0.4;">
+        </div>
+        <div class="hero-content" style="margin-top: 2rem;">
+            <div class="hero-icons" style="gap: 0.5rem; margin-bottom: 1.5rem;">
+                <svg style="width:32px;height:32px;stroke:var(--primary);" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                <svg style="width:32px;height:32px;stroke:var(--primary-light);" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                <svg style="width:32px;height:32px;stroke:var(--primary);" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            </div>
+            <h1 class="hero-title">हमारी पवित्र सेवाएं</h1>
+            <p class="hero-description">वह परामर्श शैली चुनें जो आपके आध्यात्मिक पथ से मेल खाती हो</p>
+        </div>
+    </section>
+
+    <!-- Distance Checker -->
+    <section class="services-section">
+        <div class="container">
+            <div class="distance-checker">
+                <h3 class="distance-title">
+                    <svg style="width:24px;height:24px;stroke:var(--primary);vertical-align:middle;margin-right:0.5rem;" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    परामर्श क्षेत्र की जाँच करें
+                </h3>
+                <div class="distance-form">
+                    <input type="text" id="area-input" class="form-input" placeholder="अपना क्षेत्र दर्ज करें (जैसे, ओढव, निकोल)" style="flex:1;">
+                    <button id="check-area-btn" class="btn-primary" style="padding: 0.75rem 1.5rem;">क्षेत्र की जाँच करें</button>
+                </div>
+                <p class="distance-info">
+                    <svg style="width:16px;height:16px;stroke:currentColor;vertical-align:middle;margin-right:0.25rem;" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                    घर पर परामर्श शुल्क: ₹ 2,101 / 1,101
+                </p>
+                <div id="area-result" style="display:none;"></div>
+                <div class="popular-areas">
+                    <span class="popular-label">Popular areas (6.5km):</span>
+                    <button class="area-tag" data-area="Vastral">Vastral</button>
+                    <button class="area-tag" data-area="Ramrajya Nagar">Ramrajya Nagar</button>
+                    <button class="area-tag" data-area="Mahadev Nagar">Mahadev Nagar</button>
+                    <button class="area-tag" data-area="Odhav">Odhav</button>
+                    <button class="area-tag" data-area="Nikol">Nikol</button>
+                    <button class="area-tag" data-area="Singarwa">Singarwa</button>
+                    <button class="area-tag" data-area="Amraiwadi">Amraiwadi</button>
+                    <button class="area-tag" data-area="CTM">CTM</button>
+                </div>
+            </div>
+
+            <!-- Services Grid -->
+            <div class="services-grid" style="grid-template-columns: 1fr; gap: 3rem;">
+                <!-- Home Consultation (Outside 6.5km) -->
+                <div class="service-card" style="text-align: left;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <div>
+                            <div class="service-icon" style="margin: 0 0 1.5rem;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                </svg>
+                            </div>
+                            <h3 class="service-title">घर पर परामर्श (6.5 किमी के बाहर)</h3>
+                            <p class="service-description">अहमदाबाद के वस्त्राल से 6.5 किमी से अधिक दूरी पर आपके घर पर व्यक्तिगत हमारे ज्योतिष सत्र। पूर्ण कुंडली विश्लेषण के साथ विस्तृत परामर्श।</p>
+                            <div class="service-details" style="justify-content: flex-start;">
+                                <span class="price">₹ 2,101</span>
+                                <span class="divider">|</span>
+                                <span class="duration">120 मिनट</span>
+                            </div>
+                            <a href="booking.html" class="service-btn" style="display: inline-block; width: auto; margin-top: 1rem;">
+                                <svg style="width:20px;height:20px;stroke:currentColor;vertical-align:middle;margin-right:0.5rem;" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path></svg>
+                                अभी बुक करें
+                            </a>
+                        </div>
+                        <div>
+                            <h4 style="font-family: 'Cinzel', serif; font-size: 1.25rem; margin-bottom: 1rem;">क्या शामिल है</h4>
+                            <ul style="color: var(--muted-dark); list-style: none; padding: 0;">
+                                <li style="padding: 0.5rem 0;">✓ 6.5 किमी के दायरे से बाहर परामर्श</li>
+                                <li style="padding: 0.5rem 0;">✓ विस्तृत जन्म कुंडली विश्लेषण</li>
+                                <li style="padding: 0.5rem 0;">✓ गहन ग्रह अध्ययन</li>
+                                <li style="padding: 0.5rem 0;">✓ विस्तारित दशा विश्लेषण</li>
+                                <li style="padding: 0.5rem 0;">✓ विशिष्ट उपचारात्मक उपाय</li>
+                                <li style="padding: 0.5rem 0;">✓ यात्रा समय शामिल</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Home Consultation (Within 6.5km) -->
+                <div class="service-card" style="text-align: left;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <div>
+                            <div class="service-icon" style="margin: 0 0 1.5rem;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                </svg>
+                            </div>
+                            <h3 class="service-title">घर पर परामर्श (6.5 किमी के भीतर)</h3>
+                            <p class="service-description">अहमदाबाद के वस्त्राल से 6.5 किमी के भीतर आपके घर पर व्यक्तिगत हमारे ज्योतिष सत्र। पूर्ण कुंडली विश्लेषण के साथ विस्तृत परामर्श।</p>
+                            <div class="service-details" style="justify-content: flex-start;">
+                                <span class="price">₹ 1,101</span>
+                                <span class="divider">|</span>
+                                <span class="duration">90 मिनट</span>
+                            </div>
+                            <a href="booking.html" class="service-btn" style="display: inline-block; width: auto; margin-top: 1rem;">
+                                <svg style="width:20px;height:20px;stroke:currentColor;vertical-align:middle;margin-right:0.5rem;" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path></svg>
+                                अभी बुक करें
+                            </a>
+                        </div>
+                        <div>
+                            <h4 style="font-family: 'Cinzel', serif; font-size: 1.25rem; margin-bottom: 1rem;">क्या शामिल है</h4>
+                            <ul style="color: var(--muted-dark); list-style: none; padding: 0;">
+                                <li style="padding: 0.5rem 0;">✓ वस्त्राल के 6.5 किमी के दायरे में परामर्श</li>
+                                <li style="padding: 0.5rem 0;">✓ पूर्ण जन्म कुंडली विश्लेषण</li>
+                                <li style="padding: 0.5rem 0;">✓ ग्रहों की स्थिति का अध्ययन</li>
+                                <li style="padding: 0.5rem 0;">✓ दशा और गोचर भविष्यवाणी</li>
+                                <li style="padding: 0.5rem 0;">✓ रत्न सिफारिशें</li>
+                                <li style="padding: 0.5rem 0;">✓ उपचारात्मक उपाय</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Online Consultation -->
+                <div class="service-card" style="text-align: left;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <div>
+                            <div class="service-icon" style="margin: 0 0 1.5rem;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                                    <line x1="7" y1="2" x2="7" y2="22"></line>
+                                    <line x1="17" y1="2" x2="17" y2="22"></line>
+                                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                                    <line x1="2" y1="7" x2="7" y2="7"></line>
+                                    <line x1="2" y1="17" x2="7" y2="17"></line>
+                                    <line x1="17" y1="17" x2="22" y2="17"></line>
+                                    <line x1="17" y1="7" x2="22" y2="7"></line>
+                                </svg>
+                            </div>
+                            <h3 class="service-title">ऑनलाइन परामर्श</h3>
+                            <p class="service-description">वीडियो कॉल के माध्यम से दुनिया में कहीं से भी हमसे जुड़ें। अपने घर के आराम से अपनी हमारे रीडिंग प्राप्त करें।</p>
+                            <div class="service-details" style="justify-content: flex-start;">
+                                <span class="price">₹ 501</span>
+                                <span class="divider">|</span>
+                                <span class="duration">45 मिनट</span>
+                            </div>
+                            <a href="booking.html" class="service-btn" style="display: inline-block; width: auto; margin-top: 1rem;">
+                                <svg style="width:20px;height:20px;stroke:currentColor;vertical-align:middle;margin-right:0.5rem;" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path></svg>
+                                अभी बुक करें
+                            </a>
+                        </div>
+                        <div>
+                            <h4 style="font-family: 'Cinzel', serif; font-size: 1.25rem; margin-bottom: 1rem;">क्या शामिल है</h4>
+                            <ul style="color: var(--muted-dark); list-style: none; padding: 0;">
+                                <li style="padding: 0.5rem 0;">✓ वीडियो/ऑडियो कॉल परामर्श</li>
+                                <li style="padding: 0.5rem 0;">✓ वैश्विक पहुंच</li>
+                                <li style="padding: 0.5rem 0;">✓ डिजिटल चार्ट साझाकरण</li>
+                                <li style="padding: 0.5rem 0;">✓ संक्षिप्त चार्ट विश्लेषण</li>
+                                <li style="padding: 0.5rem 0;">✓ विशिष्ट प्रश्न समाधान</li>
+                                <li style="padding: 0.5rem 0;">✓ डिजिटल उपाय रिपोर्ट</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section" style="padding: 8rem 1.5rem;">
+        <div class="container" style="max-width: 56rem; margin: 0 auto;">
+            <div class="cta-card">
+                <div style="display: flex; justify-content: center; gap: 1rem; margin-bottom: 2rem; align-items: center;">
+                    <div style="height: 1px; width: 3rem; background: linear-gradient(to right, transparent, var(--primary));"></div>
+                    <svg style="width:32px;height:32px;stroke:var(--primary);" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    <div style="height: 1px; width: 3rem; background: linear-gradient(to left, transparent, var(--primary));"></div>
+                </div>
+                <h2 class="cta-title">अपनी आध्यात्मिक यात्रा शुरू करें</h2>
+                <p class="cta-description">ज्योतिष का प्राचीन ज्ञान आपके जीवन को आलोकित करने की प्रतीक्षा कर रहा है।</p>
+                <div class="cta-actions">
+                    <a href="booking.html" class="btn-primary" style="font-size: 1.5rem; padding: 1rem 3rem; border-radius: 9999px;">
+                        <svg style="width:24px;height:24px;stroke:currentColor;margin-right:0.75rem;" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path></svg>
+                        अपनी रीडिंग बुक करें
+                    </a>
+                </div>
+                <div class="pooja-note">
+                    <div class="pooja-dot"></div>
+                    <p>परामर्श के बाद, हम सभी प्रकार की हमारे पूजा सेवाएं भी प्रदान करते हैं।</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col footer-col-wide">
+                    <div class="footer-logo">
+                        <img src="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/render/image/public/project-uploads/c601c1cc-61c8-474d-bbc9-2026bfe37c34/logo_withoutname-removebg-1767251276652.png?width=80&height=80&resize=contain" alt="Logo" class="footer-logo-img">
+                        <span>कात्यायनी ज्योतिष</span>
+                    </div>
+                    <p class="footer-text">2007 से ज्योतिष ज्ञान के माध्यम से आत्माओं का मार्गदर्शन कर रहे हैं। हमारे साथ अपनी यात्रा शुरू करें</p>
+                    <div class="newsletter-section">
+                        <h5 class="newsletter-title">न्यूज़लेटर</h5>
+                        <p class="newsletter-desc">ज्योतिष अपडेट्स और विशेष ऑफर प्राप्त करें</p>
+                        <form class="newsletter-form" id="newsletter-form">
+                            <input type="email" placeholder="आपका ईमेल" required class="newsletter-input">
+                            <button type="submit" class="newsletter-btn">सदस्यता लें</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-title">त्वरित लिंक</h4>
+                    <div class="footer-links">
+                        <a href="services.html">सेवाएं</a>
+                        <a href="booking.html">बुक करें</a>
+                        <a href="feedback.html">प्रतिक्रिया</a>
+                        <a href="about.html">हमारे बारे में</a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-title">नीतियां</h4>
+                    <div class="footer-links">
+                        <a href="/terms">शर्तें</a>
+                        <a href="/privacy">गोपनीयता</a>
+                        <a href="/refund-policy">वापसी नीति</a>
+                        <a href="/disclaimer">अस्वीकरण</a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-title">संपर्क</h4>
+                    <div class="footer-contact">
+                        <div class="contact-item">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                            <a href="https://wa.me/919824929588" target="_blank" style="color: inherit; text-decoration: none;">+91 98249 29588</a>
+                        </div>
+                        <div class="contact-item">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                            <span>katyaayaniastrologer01@gmail.com</span>
+                        </div>
+                        <div class="contact-item">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            <span>अहमदाबाद, गुजरात</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-title">समय</h4>
+                    <div class="footer-hours">
+                        <p>रविवार: सुबह 10 - शाम 7</p>
+                        <p>सोमवार - शुक्रवार: सुबह 11 - शाम 7</p>
+                        <p>शनिवार: सुबह 11 - शाम 5</p>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 कात्यायनी ज्योतिष। सर्वाधिकार सुरक्षित। ॐ शान्ति शान्ति शान्तिः।</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

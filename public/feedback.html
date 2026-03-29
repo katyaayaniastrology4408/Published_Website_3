@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>प्रतिक्रिया | Katyaayani Astrologer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/render/image/public/project-uploads/c601c1cc-61c8-474d-bbc9-2026bfe37c34/logo_withoutname-removebg-1767251276652.png?width=64&height=64&resize=contain" type="image/png">
+</head>
+<body class="dark">
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loader"></div>
+        <p class="loading-text">लोड हो रहा है...</p>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <img src="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/render/image/public/project-uploads/c601c1cc-61c8-474d-bbc9-2026bfe37c34/logo_withoutname-removebg-1767251276652.png?width=112&height=112&resize=contain" alt="Katyaayani Astrologer" class="logo-img">
+                <span class="logo-text">KATYAAYANI<br>ASTROLOGER</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html">मुखपृष्ठ</a>
+                <a href="services.html">सेवाएं</a>
+                <a href="booking.html">बुक करें</a>
+                <a href="feedback.html" class="active">प्रतिक्रिया</a>
+                <a href="about.html">हमारे बारे में</a>
+            </div>
+            <div class="nav-actions">
+                <button id="theme-toggle" class="theme-btn" aria-label="Toggle theme">
+                    <svg class="icon sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <svg class="icon moon-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
+                <a href="booking.html" class="cta-btn">बुक करें</a>
+            </div>
+            <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+        </div>
+        <div class="mobile-menu hidden" id="mobile-menu">
+            <a href="index.html">मुखपृष्ठ</a>
+            <a href="services.html">सेवाएं</a>
+            <a href="booking.html">बुक करें</a>
+            <a href="feedback.html" class="active">प्रतिक्रिया</a>
+            <a href="about.html">हमारे बारे में</a>
+        </div>
+    </nav>
+
+    <!-- Feedback Section -->
+    <div class="feedback-container">
+        <div class="section-header" style="margin-bottom: 2rem;">
+            <div style="width:64px;height:64px;border-radius:50%;background:rgba(255,107,53,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;">
+                <svg style="width:32px;height:32px;stroke:var(--primary);" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            </div>
+            <h1 class="section-title">अपनी प्रतिक्रिया साझा करें</h1>
+            <p class="section-subtitle">आपकी प्रतिक्रिया हमें बेहतर बनने में मदद करती है</p>
+        </div>
+
+        <div id="success-message" class="success-message" style="display:none;">
+            <div style="text-align:center;padding:2rem;">
+                <div style="width:80px;height:80px;border-radius:50%;background:rgba(34,197,94,0.2);display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;">
+                    <svg style="width:40px;height:40px;stroke:#22c55e;" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <h2 class="section-title">धन्यवाद!</h2>
+                <p style="color:var(--muted-dark);margin-bottom:2rem;">आपकी प्रतिक्रिया सफलतापूर्वक सबमिट हो गई है।</p>
+                <div style="display:flex;flex-direction:column;gap:0.75rem;max-width:300px;margin:0 auto;">
+                    <a href="index.html" class="btn-primary" style="text-align:center;">मुखपृष्ठ पर वापसी</a>
+                    <a href="booking.html" class="btn-secondary" style="text-align:center;">एक और सत्र बुक करें</a>
+                </div>
+            </div>
+        </div>
+
+        <div id="error-message" class="error-message" style="display:none;">
+            कुछ गलत हो गया। कृपया पुनः प्रयास करें।
+        </div>
+
+        <form id="feedback-form" class="feedback-form">
+            <!-- Rating -->
+            <div class="form-group" style="text-align:center;margin-bottom:2rem;">
+                <label class="form-label" style="font-size:1.25rem;margin-bottom:1rem;display:block;">आपका अनुभव कैसा रहा?</label>
+                <div class="rating-group">
+                    <span class="rating-star" data-value="5">&#9733;</span>
+                    <span class="rating-star" data-value="4">&#9733;</span>
+                    <span class="rating-star" data-value="3">&#9733;</span>
+                    <span class="rating-star" data-value="2">&#9733;</span>
+                    <span class="rating-star" data-value="1">&#9733;</span>
+                </div>
+                <p id="rating-text" style="color:var(--primary);margin-top:0.5rem;min-height:1.5em;"></p>
+                <input type="hidden" id="rating" name="rating" required>
+            </div>
+
+            <!-- Name & Email -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+                <div class="form-group">
+                    <label class="form-label" for="feedback-name">आपका नाम</label>
+                    <input type="text" id="feedback-name" name="name" class="form-input" placeholder="अपना नाम दर्ज करें">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="feedback-email">ईमेल</label>
+                    <input type="email" id="feedback-email" name="email" class="form-input" placeholder="your@email.com">
+                </div>
+            </div>
+
+            <!-- Consultation Type & Astrologer -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+                <div class="form-group">
+                    <label class="form-label" for="consultation-type">परामर्श प्रकार</label>
+                    <select id="consultation-type" name="consultationType" class="form-select">
+                        <option value="">प्रकार चुनें</option>
+                        <option value="home">घर पर परामर्श</option>
+                        <option value="online">ऑनलाइन बैठक</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="astrologer">आपके ज्योतिषी</label>
+                    <select id="astrologer" name="astrologer" class="form-select">
+                        <option value="">ज्योतिषी चुनें</option>
+                        <option value="rudram">Rudram Joshi | रुद्रम जोशी</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Feedback Text -->
+            <div class="form-group">
+                <label class="form-label" for="feedback-text">आपकी प्रतिक्रिया *</label>
+                <textarea id="feedback-text" name="feedback" class="form-textarea" placeholder="हमारी ज्योतिष सेवाओं के साथ अपना अनुभव साझा करें..." required></textarea>
+            </div>
+
+            <!-- Would Recommend -->
+            <div class="form-group">
+                <label class="form-label">क्या आप हमें सुझाव देंगे?</label>
+                <div class="recommend-options" id="recommend-options">
+                    <button type="button" class="recommend-btn" data-value="Definitely">अवश्य</button>
+                    <button type="button" class="recommend-btn" data-value="Maybe">शायद</button>
+                    <button type="button" class="recommend-btn" data-value="Not Sure">अनिश्चित</button>
+                    <button type="button" class="recommend-btn" data-value="No">नहीं</button>
+                </div>
+                <input type="hidden" id="would-recommend" name="wouldRecommend">
+            </div>
+
+            <button type="submit" class="submit-btn">
+                <svg style="width:20px;height:20px;stroke:currentColor;vertical-align:middle;margin-right:0.5rem;" viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                प्रतिक्रिया सबमिट करें
+            </button>
+        </form>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col footer-col-wide">
+                    <div class="footer-logo">
+                        <img src="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/render/image/public/project-uploads/c601c1cc-61c8-474d-bbc9-2026bfe37c34/logo_withoutname-removebg-1767251276652.png?width=80&height=80&resize=contain" alt="Logo" class="footer-logo-img">
+                        <span>कात्यायनी ज्योतिष</span>
+                    </div>
+                    <p class="footer-text">2007 से ज्योतिष ज्ञान के माध्यम से आत्माओं का मार्गदर्शन कर रहे हैं। हमारे साथ अपनी यात्रा शुरू करें</p>
+                    <div class="newsletter-section">
+                        <h5 class="newsletter-title">न्यूज़लेटर</h5>
+                        <p class="newsletter-desc">ज्योतिष अपडेट्स और विशेष ऑफर प्राप्त करें</p>
+                        <form class="newsletter-form" id="newsletter-form">
+                            <input type="email" placeholder="आपका ईमेल" required class="newsletter-input">
+                            <button type="submit" class="newsletter-btn">सदस्यता लें</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-title">त्वरित लिंक</h4>
+                    <div class="footer-links">
+                        <a href="services.html">सेवाएं</a>
+                        <a href="booking.html">बुक करें</a>
+                        <a href="feedback.html">प्रतिक्रिया</a>
+                        <a href="about.html">हमारे बारे में</a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-title">नीतियां</h4>
+                    <div class="footer-links">
+                        <a href="/terms">शर्तें</a>
+                        <a href="/privacy">गोपनीयता</a>
+                        <a href="/refund-policy">वापसी नीति</a>
+                        <a href="/disclaimer">अस्वीकरण</a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-title">संपर्क</h4>
+                    <div class="footer-contact">
+                        <div class="contact-item">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                            <a href="https://wa.me/919824929588" target="_blank" style="color: inherit; text-decoration: none;">+91 98249 29588</a>
+                        </div>
+                        <div class="contact-item">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                            <span>katyaayaniastrologer01@gmail.com</span>
+                        </div>
+                        <div class="contact-item">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            <span>अहमदाबाद, गुजरात</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-title">समय</h4>
+                    <div class="footer-hours">
+                        <p>रविवार: सुबह 10 - शाम 7</p>
+                        <p>सोमवार - शुक्रवार: सुबह 11 - शाम 7</p>
+                        <p>शनिवार: सुबह 11 - शाम 5</p>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 कात्यायनी ज्योतिष। सर्वाधिकार सुरक्षित। ॐ शान्ति शान्ति शान्तिः।</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

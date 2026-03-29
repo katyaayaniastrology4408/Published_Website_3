@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>बुकिंग | Katyaayani Astrologer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/render/image/public/project-uploads/c601c1cc-61c8-474d-bbc9-2026bfe37c34/logo_withoutname-removebg-1767251276652.png?width=64&height=64&resize=contain" type="image/png">
+</head>
+<body class="dark">
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loader"></div>
+        <p class="loading-text">लोड हो रहा है...</p>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <img src="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/render/image/public/project-uploads/c601c1cc-61c8-474d-bbc9-2026bfe37c34/logo_withoutname-removebg-1767251276652.png?width=112&height=112&resize=contain" alt="Katyaayani Astrologer" class="logo-img">
+                <span class="logo-text">KATYAAYANI<br>ASTROLOGER</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html">मुखपृष्ठ</a>
+                <a href="services.html">सेवाएं</a>
+                <a href="booking.html" class="active">बुक करें</a>
+                <a href="feedback.html">प्रतिक्रिया</a>
+                <a href="about.html">हमारे बारे में</a>
+            </div>
+            <div class="nav-actions">
+                <button id="theme-toggle" class="theme-btn" aria-label="Toggle theme">
+                    <svg class="icon sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <svg class="icon moon-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
+            </div>
+            <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+        </div>
+        <div class="mobile-menu hidden" id="mobile-menu">
+            <a href="index.html">मुखपृष्ठ</a>
+            <a href="services.html">सेवाएं</a>
+            <a href="booking.html" class="active">बुक करें</a>
+            <a href="feedback.html">प्रतिक्रिया</a>
+            <a href="about.html">हमारे बारे में</a>
+        </div>
+    </nav>
+
+    <!-- Booking Section -->
+    <div class="booking-container">
+        <div class="section-header" style="margin-bottom: 2rem;">
+            <h1 class="section-title">अपना परामर्श बुक करें</h1>
+            <p class="section-subtitle">चार सरल चरणों में अपनी वैदिक ज्योतिष यात्रा शुरू करें</p>
+        </div>
+
+        <!-- Step Indicator -->
+        <div class="step-indicator">
+            <div class="step active" id="step-ind-1"><span>1</span></div>
+            <div class="step-line"></div>
+            <div class="step" id="step-ind-2"><span>2</span></div>
+            <div class="step-line"></div>
+            <div class="step" id="step-ind-3"><span>3</span></div>
+            <div class="step-line"></div>
+            <div class="step" id="step-ind-4"><span>4</span></div>
+        </div>
+
+        <div id="success-message" class="success-message">
+            ✓ आपकी बुकिंग सफलतापूर्वक सबमिट हो गई है! हम जल्द ही आपसे संपर्क करेंगे।
+        </div>
+        <div id="error-message" class="error-message">
+            ⚠ कुछ गलत हो गया। कृपया पुनः प्रयास करें।
+        </div>
+
+        <form id="booking-form" class="booking-form">
+            <!-- Step 1: City & Consultation Type -->
+            <div id="booking-step-1" class="booking-step">
+                <h2 style="font-family:'Cinzel',serif; font-size:1.5rem; margin-bottom:1.5rem; text-align:center;">परामर्श प्रकार चुनें</h2>
+                <div class="form-group">
+                    <label class="form-label" for="city">आपका शहर *</label>
+                    <input type="text" id="city" name="city" class="form-input" placeholder="जैसे, अहमदाबाद" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="service-type">सेवा प्रकार *</label>
+                    <select id="service-type" name="serviceType" class="form-select" required>
+                        <option value="">चुनें...</option>
+                        <option value="home-outside">घर पर परामर्श - 6.5km बाहर (₹ 2,101) - 120 मिनट</option>
+                        <option value="home-within">घर पर परामर्श - 6.5km भीतर (₹ 1,101) - 90 मिनट</option>
+                        <option value="online">ऑनलाइन परामर्श (₹ 501) - 45 मिनट</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-primary" id="step1-next" disabled>जारी रखें</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Personal Details -->
+            <div id="booking-step-2" class="booking-step" style="display:none;">
+                <h2 style="font-family:'Cinzel',serif; font-size:1.5rem; margin-bottom:1.5rem; text-align:center;">आपकी जानकारी</h2>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem;">
+                    <div class="form-group">
+                        <label class="form-label" for="name">पूरा नाम *</label>
+                        <input type="text" id="name" name="name" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="email">ईमेल *</label>
+                        <input type="email" id="email" name="email" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="phone">फ़ोन नंबर *</label>
+                        <input type="tel" id="phone" name="phone" class="form-input" placeholder="+91 98249 29588" required>
+                    </div>
+                    <div class="form-group" id="address-group" style="display:none;">
+                        <label class="form-label" for="address">पता</label>
+                        <input type="text" id="address" name="address" class="form-input" placeholder="आपका घर का पता">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="birth-date">जन्म तिथि *</label>
+                        <input type="date" id="birth-date" name="birthDate" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="birth-time">जन्म समय *</label>
+                        <input type="time" id="birth-time" name="birthTime" class="form-input" required>
+                    </div>
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label class="form-label" for="birth-place">जन्म स्थान</label>
+                        <input type="text" id="birth-place" name="birthPlace" class="form-input" placeholder="शहर, देश">
+                    </div>
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label class="form-label" for="concerns">विशेष प्रश्न</label>
+                        <textarea id="concerns" name="concerns" class="form-textarea" placeholder="करियर, रिश्ते, आदि..."></textarea>
+                    </div>
+                </div>
+                <div class="form-actions" style="display:flex; justify-content:space-between; margin-top:2rem;">
+                    <button type="button" class="btn-secondary" id="step2-back">वापस</button>
+                    <button type="button" class="btn-primary" id="step2-next">जारी रखें</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Date & Time -->
+            <div id="booking-step-3" class="booking-step" style="display:none;">
+                <h2 style="font-family:'Cinzel',serif; font-size:1.5rem; margin-bottom:1.5rem; text-align:center;">तिथि और समय चुनें</h2>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:2rem;">
+                    <div class="form-group">
+                        <label class="form-label" for="preferred-date">पसंदीदा तिथि *</label>
+                        <input type="date" id="preferred-date" name="preferredDate" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">पसंदीदा समय *</label>
+                        <div class="time-slots" id="time-slots">
+                            <button type="button" class="time-slot-btn" data-time="10:00 AM">10:00 AM</button>
+                            <button type="button" class="time-slot-btn" data-time="11:00 AM">11:00 AM</button>
+                            <button type="button" class="time-slot-btn" data-time="12:00 PM">12:00 PM</button>
+                            <button type="button" class="time-slot-btn" data-time="2:00 PM">2:00 PM</button>
+                            <button type="button" class="time-slot-btn" data-time="3:00 PM">3:00 PM</button>
+                            <button type="button" class="time-slot-btn" data-time="4:00 PM">4:00 PM</button>
+                            <button type="button" class="time-slot-btn" data-time="5:00 PM">5:00 PM</button>
+                            <button type="button" class="time-slot-btn" data-time="6:00 PM">6:00 PM</button>
+                            <button type="button" class="time-slot-btn" data-time="7:00 PM">7:00 PM</button>
+                        </div>
+                        <input type="hidden" id="selected-time" name="preferredTime" required>
+                    </div>
+                </div>
+                <div class="form-actions" style="display:flex; justify-content:space-between; margin-top:2rem;">
+                    <button type="button" class="btn-secondary" id="step3-back">वापस</button>
+                    <button type="submit" class="btn-primary" id="step3-submit">अभी बुक करें</button>
+                </div>
+            </div>
+
+            <!-- Step 4: Confirmation -->
+            <div id="booking-step-4" class="booking-step" style="display:none;">
+                <div style="text-align:center;">
+                    <div style="width:6rem;height:6rem;border-radius:50%;background:rgba(255,107,53,0.2);display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;">
+                        <svg style="width:3rem;height:3rem;stroke:var(--primary);" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </div>
+                    <h2 class="section-title">बुकिंग सबमिट हो गई!</h2>
+                    <p style="color:var(--muted-dark);font-size:1.25rem;margin-bottom:2rem;">हम जल्द ही आपसे संपर्क करेंगे। धन्यवाद!</p>
+                    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+                        <a href="index.html" class="btn-primary">मुखपृष्ठ पर वापसी</a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col footer-col-wide">
+                    <div class="footer-logo">
+                        <img src="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/render/image/public/project-uploads/c601c1cc-61c8-474d-bbc9-2026bfe37c34/logo_withoutname-removebg-1767251276652.png?width=80&height=80&resize=contain" alt="Logo" class="footer-logo-img">
+                        <span>कात्यायनी ज्योतिष</span>
+                    </div>
+                    <p class="footer-text">2007 से ज्योतिष ज्ञान के माध्यम से आत्माओं का मार्गदर्शन कर रहे हैं।</p>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-title">त्वरित लिंक</h4>
+                    <div class="footer-links">
+                        <a href="services.html">सेवाएं</a>
+                        <a href="booking.html">बुक करें</a>
+                        <a href="feedback.html">प्रतिक्रिया</a>
+                        <a href="about.html">हमारे बारे में</a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-title">संपर्क</h4>
+                    <div class="footer-contact">
+                        <div class="contact-item">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                            <a href="https://wa.me/919824929588" target="_blank" style="color:inherit;text-decoration:none;">+91 98249 29588</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 कात्यायनी ज्योतिष। सर्वाधिकार सुरक्षित। ॐ शान्ति शान्ति शान्तिः।</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

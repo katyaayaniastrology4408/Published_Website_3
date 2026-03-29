@@ -1,0 +1,127 @@
+316:    <div className={`min-h-screen flex ${theme === "dark" ? "bg-[#0a0a0f] text-[#f5f0e8]" : "bg-background text-[#2d1810]"}`}>
+318:        <div className="h-full flex flex-col p-6">
+319:          <div className="flex items-center justify-between mb-10">
+340:          <div className="pt-6 border-t border-[#ff6b35]/10 space-y-4">
+354:      <div className="flex-1 flex flex-col min-h-screen relative overflow-hidden">
+356:          <div className="flex items-center gap-4">
+360:          <div className="flex items-center gap-2">
+370:            <div className="h-[60vh] flex flex-col items-center justify-center gap-4">
+371:              <div className="w-12 h-12 border-4 border-[#ff6b35]/20 border-t-[#ff6b35] rounded-full animate-spin" />
+379:                  <div className="space-y-8">
+380:                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+383:                          <div className="flex items-center justify-between">
+384:                            <div><p className="text-sm font-medium text-gray-500">Gross Revenue</p><h3 className="text-2xl font-bold mt-1 tracking-tight">₹{formatCurrency(analytics.totalRevenue)}</h3></div>
+385:                            <div className="p-3 bg-green-500/10 rounded-xl"><IndianRupee className="w-6 h-6 text-green-500" /></div>
+391:                          <div className="flex items-center justify-between">
+392:                            <div><p className="text-sm font-medium text-gray-500">Total Bookings</p><h3 className="text-2xl font-bold mt-1 tracking-tight">{bookings.length}</h3></div>
+393:                            <div className="p-3 bg-[#ff6b35]/10 rounded-xl"><Calendar className="w-6 h-6 text-[#ff6b35]" /></div>
+399:                          <div className="flex items-center justify-between">
+400:                            <div><p className="text-sm font-medium text-gray-500">Registered Users</p><h3 className="text-2xl font-bold mt-1 tracking-tight">{users.length}</h3></div>
+401:                            <div className="p-3 bg-blue-500/10 rounded-xl"><Users className="w-6 h-6 text-blue-500" /></div>
+407:                          <div className="flex items-center justify-between">
+408:                            <div><p className="text-sm font-medium text-gray-500">Total Feedback</p><h3 className="text-2xl font-bold mt-1 tracking-tight">{feedbacks.length}</h3></div>
+409:                            <div className="p-3 bg-purple-500/10 rounded-xl"><Star className="w-6 h-6 text-purple-500" /></div>
+418:                        <div className="w-full h-full max-w-[1100px]">
+428:                          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-none">
+439:                  <div className="space-y-6">
+440:                    <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+441:                      <div className="relative w-full md:w-96">
+450:                      <div className="flex gap-2">
+457:                    <div className="grid grid-cols-1 gap-6">
+459:                        <div className="text-center py-20 bg-white/5 rounded-[2.5rem] border border-dashed border-[#ff6b35]/20">
+467:                            <div className={`h-1 w-full ${booking.status === 'confirmed' ? 'bg-blue-500' : (booking.status === 'completed' ? 'bg-green-500' : (booking.status === 'cancelled' ? 'bg-red-500' : 'bg-yellow-500'))}`} />
+469:                              <div className="flex flex-col lg:flex-row">
+470:                                <div className="flex-1 p-6 lg:p-8 space-y-6 border-b lg:border-b-0 lg:border-r border-[#ff6b35]/10">
+471:                                  <div className="flex items-start justify-between">
+472:                                    <div className="flex items-center gap-5">
+473:                                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-bold ${theme === 'dark' ? 'bg-[#ff6b35]/10 text-[#ff6b35]' : 'bg-[#ff6b35]/5 text-[#ff6b35]'}`}>
+476:                                      <div>
+478:                                        <div className="flex flex-wrap gap-2 mt-2">
+490:                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8">
+491:                                    <div className="space-y-3">
+492:                                      <div className="flex items-center gap-3 text-sm opacity-80 group cursor-pointer hover:text-[#ff6b35] transition-colors">
+493:                                        <div className="p-2 rounded-lg bg-gray-500/5 group-hover:bg-[#ff6b35]/10"><Mail className="w-4 h-4" /></div>
+496:                                      <div className="flex items-center gap-3 text-sm opacity-80 group cursor-pointer hover:text-[#ff6b35] transition-colors">
+497:                                        <div className="p-2 rounded-lg bg-gray-500/5 group-hover:bg-[#ff6b35]/10"><Phone className="w-4 h-4" /></div>
+501:                                    <div className="space-y-3">
+502:                                      <div className="flex items-center gap-3 text-sm opacity-80 group">
+503:                                        <div className="p-2 rounded-lg bg-gray-500/5 group-hover:bg-[#ff6b35]/10"><Calendar className="w-4 h-4" /></div>
+506:                                      <div className="flex items-center gap-3 text-sm opacity-80 group">
+507:                                        <div className="p-2 rounded-lg bg-gray-500/5 group-hover:bg-[#ff6b35]/10"><Clock className="w-4 h-4" /></div>
+514:                                    <div className="p-4 rounded-2xl bg-gray-500/5 border border-dashed border-gray-500/10 text-sm italic opacity-70">
+521:                                <div className={`w-full lg:w-[420px] p-6 lg:p-8 flex flex-col justify-between gap-8 ${theme === 'dark' ? 'bg-[#0a0a0f]/40' : 'bg-gray-50/50'}`}>
+522:                                  <div className="space-y-6">
+523:                                    <div className="flex items-center justify-between p-4 rounded-2xl bg-white/40 dark:bg-black/20 border border-white/10 shadow-sm">
+524:                                      <div>
+530:                                      <div className="text-right">
+536:                                    <div className="space-y-4">
+537:                                      <div className="flex items-center justify-between mb-1">
+542:                                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+578:                                    <div className="space-y-4 pt-4 border-t border-[#ff6b35]/10">
+579:                                      <div className="flex items-center justify-between mb-1">
+584:                                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+593:                                          <div className="h-11 flex items-center justify-center rounded-xl bg-gray-500/5 text-gray-400 text-[10px] font-bold border border-gray-500/10">
+623:                                          <div className="h-11 flex items-center justify-center rounded-xl bg-red-500/5 text-red-400 text-[10px] font-bold border border-red-500/10">
+640:                        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
+642:                            <div className="flex justify-between items-center mb-6">
+647:                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+648:                              <div className="space-y-6">
+649:                                <div>
+651:                                  <div className="space-y-4">
+652:                                    <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest opacity-60">New Date</label><Input type="date" value={rescheduleData.date} onChange={(e) => setRescheduleData({...rescheduleData, date: e.target.value})} className={`h-12 rounded-xl ${theme === 'dark' ? 'bg-[#0a0a0f] border-white/10' : 'bg-gray-50 border-gray-200'}`} /></div>
+653:                                    <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest opacity-60">New Time</label><Input type="time" value={rescheduleData.time} onChange={(e) => setRescheduleData({...rescheduleData, time: e.target.value})} className={`h-12 rounded-xl ${theme === 'dark' ? 'bg-[#0a0a0f] border-white/10' : 'bg-gray-50 border-gray-200'}`} /></div>
+657:                                <div className="pt-4 border-t border-[#ff6b35]/10">
+658:                                  <div className="flex items-center gap-2 mb-4">
+662:                                  <div className="space-y-2">
+674:                              <div className="space-y-4">
+676:                                <div className={`p-6 rounded-2xl border border-dashed ${theme === 'dark' ? 'bg-[#0a0a0f] border-white/5' : 'bg-gray-50 border-gray-200'} text-[13px] leading-relaxed`}>
+677:                                  <div className="space-y-3 opacity-80">
+680:                                    <div className="bg-[#ff6b35]/5 p-3 rounded-lg border border-[#ff6b35]/10 font-bold text-[#ff6b35]">
+683:                                    <div className="whitespace-pre-wrap py-2">{rescheduleData.customMessage}</div>
+685:                                    <div className="pt-2">
+687:                                        <div className="w-full h-10 bg-[#ff6b35] rounded-lg flex items-center justify-center text-white font-bold cursor-pointer hover:bg-[#ff8a5d] transition-colors gap-2">
+698:                            <div className="flex gap-3 mt-8">
+711:                        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+713:                            <div className="flex justify-between items-center mb-6">
+718:                            <div className="space-y-6">
+721:                              <div className="max-h-[40vh] overflow-y-auto space-y-3 pr-2">
+723:                                    <div key={b.id} className="flex items-center justify-between p-4 rounded-2xl bg-gray-500/5 border border-[#ff6b35]/10">
+724:                                      <div>
+728:                                      <div className="flex gap-2">
+747:                  <div className="space-y-6">
+748:                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+752:                            <div className="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500 font-bold">{u.name ? u.name[0] : 'U'}</div>
+753:                            <div><h4 className="font-bold">{u.name}</h4><p className="text-sm text-gray-500">{u.email}</p></div>
+762:                  <div className="space-y-6">
+763:                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+767:                            <div className="flex items-center justify-between"><div className="flex items-center gap-2 font-bold"><Star className="w-4 h-4 text-yellow-500 fill-yellow-500" /> {f.rating}/5</div><Badge variant={f.is_approved ? "default" : "outline"}>{f.is_approved ? "Approved" : "Pending"}</Badge></div>
+769:                            <div className="text-sm font-medium">— {f.name}</div>
+778:                  <div className="space-y-8">
+783:                          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+784:                            <div className="space-y-2"><label className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Date</label><Input type="date" className={`h-12 rounded-xl ${theme === 'dark' ? 'bg-[#0a0a0f] border-[#ff6b35]/20' : 'bg-white border-[#ff6b35]/20'}`} value={newAvailability.date} onChange={(e) => setNewAvailability({ ...newAvailability, date: e.target.value })} /></div>
+785:                              <div className="space-y-2">
+787:                                <div className="flex gap-2">
+804:                            <div className="space-y-2"><label className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Notes (Internal)</label><Input placeholder="e.g. Festival Holiday" className={`h-12 rounded-xl ${theme === 'dark' ? 'bg-[#0a0a0f] border-[#ff6b35]/20' : 'bg-white border-[#ff6b35]/20'}`} value={newAvailability.notes} onChange={(e) => setNewAvailability({ ...newAvailability, notes: e.target.value })} /></div>
+808:                            <div className={`mt-8 p-6 rounded-2xl border border-dashed ${!newAvailability.is_available ? 'border-red-500/20 bg-red-500/5' : 'border-[#ff6b35]/20 bg-[#ff6b35]/5'}`}>
+813:                                <div className="space-y-3">
+822:                                      <div key={b.id} className="flex items-center justify-between p-3 rounded-xl bg-white/50 dark:bg-black/20">
+823:                                        <div>
+830:                                          <div className="flex gap-2">
+853:                          <div className="flex justify-center pt-8"><Button type="submit" className="bg-[#ff6b35] hover:bg-[#ff8a5d] text-white font-bold h-12 px-12 rounded-xl shadow-lg shadow-[#ff6b35]/20 transition-all hover:scale-[1.02] active:scale-[0.98]">Update Celestial Window</Button></div>
+858:                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+859:                      {availability.length === 0 ? <div className="col-span-full text-center py-20 bg-white/5 rounded-3xl border border-dashed border-[#ff6b35]/20"><Clock className="w-12 h-12 text-gray-400 mx-auto mb-4" /><h3 className="text-lg font-medium">No special availability rules set</h3><p className="text-gray-500">System is using default business hours</p></div> : 
+863:                              <div className="flex items-center justify-between"><div className="flex items-center gap-2 font-bold"><Calendar className="w-4 h-4 text-[#ff6b35]" /> {a.date}</div><div className="flex items-center gap-2"><Badge variant={a.is_available ? "default" : "destructive"}>{a.is_available ? "Working" : "Busy"}</Badge><Button size="icon" variant="ghost" onClick={() => deleteAvailability(a.date)} className="text-red-500 hover:bg-red-500/10 h-8 w-8"><Trash2 className="w-4 h-4" /></Button></div></div>
+864:                              {a.blocked_times && a.blocked_times.length > 0 && <div className="text-sm text-gray-500">Blocked slots: {a.blocked_times.join(", ")}</div>}
+875:                  <div className="space-y-6">
+876:                    <div className="grid grid-cols-1 gap-4">
+877:                      {enquiries.length === 0 ? <div className="text-center py-20 bg-white/5 rounded-3xl border border-dashed border-[#ff6b35]/20"><Mail className="w-12 h-12 text-gray-400 mx-auto mb-4" /><h3 className="text-lg font-medium">No enquiries yet</h3></div> : 
+881:                              <div className="space-y-1"><h4 className="font-bold">{e.name}</h4><div className="flex flex-wrap gap-4 text-sm text-gray-500"><span className="flex items-center gap-1"><MailIcon className="w-3 h-3" /> {e.email}</span><span className="flex items-center gap-1"><PhoneIcon className="w-3 h-3" /> {e.phone}</span></div></div>
+882:                              <div className="flex items-center gap-6"><div className="md:text-right"><p className="text-sm font-bold text-[#ff6b35]">{e.subject}</p><p className="text-sm text-gray-500 max-w-md truncate">{e.message}</p></div><Button size="icon" variant="ghost" onClick={() => deleteItem('enquiry', e.id)} className="text-red-500 hover:bg-red-500/10 h-8 w-8"><Trash2 className="w-4 h-4" /></Button></div>
+892:                  <div className="max-w-2xl mx-auto space-y-8">
+896:                        <div className="space-y-2"><label className="text-sm font-medium text-gray-500">New Password</label><div className="relative"><Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" /><Input type="password" placeholder="Enter new password" className={`pl-10 h-12 rounded-xl ${theme === 'dark' ? 'bg-[#0a0a0f] border-[#ff6b35]/20' : 'bg-white border-[#ff6b35]/20'}`} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} /></div></div>
+904:                        <div className="space-y-2">
+906:                          <div className="relative">
+931:                          <div className="space-y-2">
+933:                            <div className="relative">
+944:                          <div className="flex flex-col sm:flex-row gap-4">
+966:                      <CardContent><div className="grid grid-cols-2 gap-4"><div className="p-4 rounded-xl bg-gray-500/5"><p className="text-xs text-gray-500 uppercase font-bold mb-1">Environment</p><p className="font-bold text-green-500">Live</p></div><div className="p-4 rounded-xl bg-gray-500/5"><p className="text-xs text-gray-500 uppercase font-bold mb-1">Last Sync</p><p className="font-bold">{new Date().toLocaleTimeString()}</p></div></div></CardContent>

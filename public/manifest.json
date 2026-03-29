@@ -1,0 +1,25 @@
+{
+  "name": "Katyaayani Astrologer - Best Vedic Astrologer",
+  "short_name": "Katyaayani",
+  "description": "Katyaayani Astrologer connects modern times with ancient astrology, blending ancient wisdom with today's technology to provide accurate guidance, practical solutions, and personalized remedies.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#FF6B00",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en-IN",
+  "categories": ["astrology", "lifestyle", "education"],
+  "icons": [
+    {
+      "src": "https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/render/image/public/project-uploads/c601c1cc-61c8-474d-bbc9-2026bfe37c34/logo_withoutname-removebg-1767251276652.png?width=192&height=192&resize=contain",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/render/image/public/project-uploads/c601c1cc-61c8-474d-bbc9-2026bfe37c34/logo_withoutname-removebg-1767251276652.png?width=512&height=512&resize=contain",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
