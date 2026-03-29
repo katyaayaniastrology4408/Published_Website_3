@@ -20,7 +20,9 @@ export default function UnifiedLoginPopup() {
       }
 
         const timer = setTimeout(() => {
-          if (!user) {
+          // Do not show on blog or rashifal pages automaticlly to reduce friction
+          const isPublicPage = window.location.pathname.startsWith('/blog') || window.location.pathname.startsWith('/rashifal');
+          if (!user && !isPublicPage) {
             setIsVisible(true);
           }
         }, 2000);

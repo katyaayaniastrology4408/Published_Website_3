@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase, supabaseAdmin } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase";
 import { sendEmail } from "@/lib/email.config";
+export const dynamic = 'force-dynamic';
 
 // GET: Fetch approved reviews for the public website
 export async function GET(req: NextRequest) {
@@ -9,7 +10,9 @@ export async function GET(req: NextRequest) {
     const rating = searchParams.get('rating');
     const featuredOnly = searchParams.get('featured');
 
-    let query = supabase
+    const supabaseAdmin = getSupabaseAdmin();
+
+    let query = supabaseAdmin
       .from("reviews")
       .select("id, name, rating, message, is_featured, created_at")
       .eq("status", "approved")
@@ -53,8 +56,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: "Only 3, 4, or 5 star ratings are allowed" }, { status: 400 });
     }
 
+    const supabaseAdmin = getSupabaseAdmin();
+
     // 3. Database Insertion (Status automatically approved for 3+ stars)
-    const { data: insertData, error: insertError } = await supabase
+    const { data: insertData, error: insertError } = await supabaseAdmin
       .from("reviews")
       .insert({
         name,

@@ -24,57 +24,67 @@ export const supabase = new Proxy({} as any, {
         if (prop === 'auth') return noopAuth;
         return () => ({ data: null, error: new Error('Supabase not configured') });
       }
-supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
-}
-const value = supabaseClient[prop];
-if (typeof value === 'function') {
-return value.bind(supabaseClient);
-}
-return value;
-}
+
+      // Use the proxy on the client side to bypass regional blocks (e.g. in India)
+      const isClient = typeof window !== 'undefined';
+      const effectiveUrl = isClient ? '/api/sb-proxy' : supabaseUrl;
+
+      supabaseClient = createClient(effectiveUrl, supabaseAnonKey, {
+        auth: {
+          persistSession: isClient,
+          autoRefreshToken: isClient,
+        }
+      });
+    }
+    const value = supabaseClient[prop];
+    if (typeof value === 'function') {
+      return value.bind(supabaseClient);
+    }
+    return value;
+  }
 });
 
 // Helper for admin client - only call this from server-side code
 export const getSupabaseAdmin = () => {
-const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-if (!supabaseUrl) {
-throw new Error('NEXT_PUBLIC_SUPABASE_URL is missing');
-}
-if (!supabaseServiceRoleKey) {
-throw new Error('SUPABASE_SERVICE_ROLE_KEY is missing');
-}
-return createClient(supabaseUrl, supabaseServiceRoleKey, {
-auth: {
-autoRefreshToken: false,
-persistSession: false,
-},
-});
+  const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl) {
+    throw new Error('NEXT_PUBLIC_SUPABASE_URL is missing');
+  }
+  if (!supabaseServiceRoleKey) {
+    throw new Error('SUPABASE_SERVICE_ROLE_KEY is missing');
+  }
+  return createClient(supabaseUrl, supabaseServiceRoleKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
 };
 
 // For backward compatibility in server-side code - lazy initialize to avoid env var issues at build/module load
 let adminClient: any = null;
 export const supabaseAdmin = typeof window === 'undefined' 
-? new Proxy({} as any, {
-get: (target, prop) => {
-if (!adminClient) {
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co";
-const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "placeholder-key";
+  ? new Proxy({} as any, {
+      get: (target, prop) => {
+        if (!adminClient) {
+          const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co";
+          const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "placeholder-key";
 
-adminClient = createClient(supabaseUrl, supabaseServiceRoleKey, {
-auth: {
-autoRefreshToken: false,
-persistSession: false,
-},
-});
-}
-const value = adminClient[prop];
-if (typeof value === 'function') {
-return value.bind(adminClient);
-}
-return value;
-}
-})
-: null as any;
+          adminClient = createClient(supabaseUrl, supabaseServiceRoleKey, {
+            auth: {
+              autoRefreshToken: false,
+              persistSession: false,
+            },
+          });
+        }
+        const value = adminClient[prop];
+        if (typeof value === 'function') {
+          return value.bind(adminClient);
+        }
+        return value;
+      }
+    })
+  : null as any;
 
 export type Booking = {
   id?: string;

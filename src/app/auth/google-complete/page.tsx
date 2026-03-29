@@ -44,7 +44,8 @@ function GoogleCompleteInner() {
 
       const isComplete = profile?.dob && profile?.pob && profile?.phone && profile?.gender && profile?.address;
 
-      if (!isComplete) {
+      // Fallback: only new users go to complete-profile by default.
+      if (isNew && !isComplete) {
         router.replace("/complete-profile");
       } else {
         router.replace("/");

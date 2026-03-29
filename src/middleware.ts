@@ -96,7 +96,7 @@ function checkCsrf(req: NextRequest): boolean {
   return allowed.some((a) => source.startsWith(a));
 }
 
-export async function proxy(req: NextRequest) {
+export async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || req.headers.get("x-real-ip") || "unknown";
   maybeCleanup();

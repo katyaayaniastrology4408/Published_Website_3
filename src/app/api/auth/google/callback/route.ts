@@ -1,12 +1,8 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { supabaseAdmin } from "@/lib/supabase";
 import { sendWelcomeBackEmail } from "@/lib/email";
 import { syncToSubscribers } from "@/lib/subscribers";
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || "placeholder-key"
-);
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
@@ -89,7 +85,7 @@ export async function GET(req: Request) {
 
     // Find or create user in Supabase Auth
     const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
-    const existingAuthUser = existingUsers?.users?.find(u => u.email === googleUser.email);
+    const existingAuthUser = existingUsers?.users?.find((u: any) => u.email === googleUser.email);
 
     let supabaseUserId: string;
     let isNew = false;
@@ -149,10 +145,9 @@ export async function GET(req: Request) {
     }
     // For new users, welcome email sent after completing profile in /complete-profile
 
-    // Check if existing user has complete profile — determine redirect target
-    const profileComplete = existingProfile?.dob && existingProfile?.pob && existingProfile?.phone && existingProfile?.gender && existingProfile?.address;
-    // isNew=false & profile complete → go to home; isNew=false & incomplete → complete-profile; isNew=true → complete-profile
-    const redirectTarget = (!isNew && profileComplete) ? "home" : "complete-profile";
+    // Redirect logic: only new users go to complete-profile by default.
+    // Existing users go to home, even if profile is "incomplete", per user request to reduce friction.
+    const redirectTarget = (isNew) ? "complete-profile" : "home";
 
     // Create a magic link session for the user so Supabase client picks up the session
     const { data: sessionData, error: sessionError } = await supabaseAdmin.auth.admin.generateLink({
