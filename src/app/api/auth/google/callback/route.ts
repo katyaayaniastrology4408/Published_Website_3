@@ -159,7 +159,8 @@ export async function GET(req: Request) {
       const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
       // CRITICAL: Route via proxy if in India context to avoid hang on .supabase.co
       if (supabaseUrl && actionLink.startsWith(supabaseUrl)) {
-        actionLink = actionLink.replace(supabaseUrl, `${appUrl}/api/sb-proxy`);
+        const proxyBase = appUrl.endsWith('/') ? `${appUrl}api/sb-proxy` : `${appUrl}/api/sb-proxy`;
+        actionLink = actionLink.replace(supabaseUrl, proxyBase);
       }
       return NextResponse.redirect(actionLink);
     }

@@ -15,18 +15,22 @@ function GoogleCompleteInner() {
       const target = searchParams.get("target"); // "home" or "complete-profile"
 
       // Wait a moment for magic link session to be set by Supabase
-      await new Promise(r => setTimeout(r, 1000));
+      await new Promise(r => setTimeout(r, 500));
 
       const { data: { user } } = await supabase.auth.getUser();
 
       if (!user) {
-        router.replace("/signin?error=Session+not+found");
-        return;
+        // Fallback: try one more time if it's very slow
+        await new Promise(r => setTimeout(r, 500));
+        const { data: { user: user2 } } = await supabase.auth.getUser();
+        if (!user2) {
+          window.location.href = "/signin?error=Session+not+found";
+          return;
+        }
       }
 
       // Always redirect to home for Google auth to reduce friction.
-      // They only give us the name, details to be added later on profile page.
-      router.replace("/");
+      window.location.href = "/";
     };
 
     finish();

@@ -85,7 +85,9 @@ async function handleProxy(req: NextRequest, paramsPromise: Promise<{ path: stri
         // CRITICAL: Rewrite Location header if it points to Supabase directly
         if (key.toLowerCase() === 'location' && val.startsWith(supabaseUrl)) {
           const appUrl = req.nextUrl.origin;
-          val = val.replace(supabaseUrl, `${appUrl}/api/sb-proxy`);
+          // Ensure we don't have double slashes
+          const proxyBase = appUrl.endsWith('/') ? `${appUrl}api/sb-proxy` : `${appUrl}/api/sb-proxy`;
+          val = val.replace(supabaseUrl, proxyBase);
         }
         responseHeaders.set(key, val);
       }

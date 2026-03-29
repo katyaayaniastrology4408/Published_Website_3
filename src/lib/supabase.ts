@@ -27,7 +27,7 @@ export const supabase = new Proxy({} as any, {
 
       // Use the proxy on the client side to bypass regional blocks (e.g. in India)
       const isClient = typeof window !== 'undefined';
-      const effectiveUrl = isClient ? '/api/sb-proxy' : supabaseUrl;
+      const effectiveUrl = isClient ? `${window.location.origin}/api/sb-proxy` : supabaseUrl;
 
       supabaseClient = createClient(effectiveUrl, supabaseAnonKey, {
         auth: {
