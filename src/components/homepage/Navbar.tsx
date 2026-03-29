@@ -91,7 +91,7 @@ export default function Navbar({ hasNotification = false }: NavbarProps) {
                   <Link href="/services" className="hover:text-[#ff6b35] transition-colors text-sm lg:text-lg">{t("Services")}</Link>
                     <Link href="/booking" className="hover:text-[#ff6b35] transition-colors text-sm lg:text-lg">{t("Book")}</Link>
                   <Link href="/blog" className="hover:text-[#ff6b35] transition-colors text-sm lg:text-lg">{t("Blog")}</Link>
-                  <Link href="/feedback" className="hover:text-[#ff6b35] transition-colors text-sm lg:text-lg">{t("Feedback")}</Link>
+                  <Link href="/reviews" className="hover:text-[#ff6b35] transition-colors text-sm lg:text-lg">{t("Feedback")}</Link>
                 <Link href="/about" className="hover:text-[#ff6b35] transition-colors text-sm lg:text-lg">{t("About")}</Link>
               </div>
 
@@ -180,7 +180,7 @@ export default function Navbar({ hasNotification = false }: NavbarProps) {
                       <Link href="/services" className="block py-2" onClick={() => setIsMenuOpen(false)}>{t("Services")}</Link>
                       <Link href="/booking" className="block py-2" onClick={() => setIsMenuOpen(false)}>{t("Book")}</Link>
                       <Link href="/blog" className="block py-2" onClick={() => setIsMenuOpen(false)}>{t("Blog")}</Link>
-                      <Link href="/feedback" className="block py-2" onClick={() => setIsMenuOpen(false)}>{t("Feedback")}</Link>
+                      <Link href="/reviews" className="block py-2" onClick={() => setIsMenuOpen(false)}>{t("Feedback")}</Link>
                     <Link href="/about" className="block py-2" onClick={() => setIsMenuOpen(false)}>{t("About")}</Link>
 
                 <button 

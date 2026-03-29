@@ -74,29 +74,40 @@ export default function Footer() {
               {content.footerDesc}
             </p>
             
-            {/* Google Reviews Badge */}
-              <div className="mt-6 flex flex-col items-start gap-2">
-                <div className="flex items-center gap-2">
-                  <img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google" width={49} height={16} className="h-4 object-contain" />
-                  <div className="flex gap-0.5">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-3 h-3 fill-[#FBBC05] text-[#FBBC05]" />
-                  ))}
+            {/* Google Reviews Widget */}
+            <a 
+              href="https://search.google.com/local/reviews?placeid=ChIJU4nnqVi3bg4RyDOjuqExd_w"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`mt-8 block w-full max-w-sm rounded-2xl p-4 border transition-all hover:shadow-lg hover:-translate-y-1 ${theme === 'dark' ? 'bg-[#1a1a2e] border-[#ff6b35]/20' : 'bg-white border-[#ff6b35]/20 shadow-md'}`}
+            >
+              <div className="flex justify-between items-start mb-2">
+                <div className="flex flex-col">
+                  <span className={`text-xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    4.9
+                    <span className="text-sm font-normal opacity-60 ml-1">/ 5.0</span>
+                  </span>
+                  <div className="flex items-center gap-1 mt-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-[#FBBC05] text-[#FBBC05]" />
+                    ))}
+                  </div>
                 </div>
+                <img 
+                  src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" 
+                  alt="Google" 
+                  className="h-5 object-contain" 
+                />
               </div>
-                  <p className={`text-xs font-bold ${theme === 'dark' ? 'text-[#f5f0e8]' : 'text-[#4a3f35]'}`}>
-                    4.9 / 5.0 {language === 'gu' ? '(૧૦,૦૦૦+ પરામર્શ)' : language === 'hi' ? '(10,000+ परामर्श)' : '(10,000+ Consultations)'}
-                  </p>
-                <a 
-                  href="https://search.google.com/local/reviews?placeid=ChIJU4nnqVi3bg4RyDOjuqExd_w"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[10px] font-bold text-[#4285F4] hover:underline flex items-center gap-1"
-                >
-                  {t("View all reviews on Google")}
-                  <ChevronRight className="w-3 h-3" />
-                </a>
-            </div>
+              <div className="mt-3 flex items-center justify-between">
+                <p className={`text-xs font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                  {language === 'gu' ? '૧૦,૦૦૦+ પરામર્શ' : language === 'hi' ? '10,000+ परामर्श' : '10,000+ Consultations'}
+                </p>
+                <span className="text-[10px] font-bold text-[#4285F4] flex items-center">
+                  {t("View all")} <ChevronRight className="w-3 h-3" />
+                </span>
+              </div>
+            </a>
 
             {/* Newsletter */}
             <div className="mt-6">
@@ -183,8 +194,7 @@ export default function Footer() {
                 <Link href="/services" className={`${theme === 'dark' ? 'text-[#a0998c]' : 'text-[#6b5847]'} hover:text-[#ff6b35] transition-colors`}>{t("Services")}</Link>
                   <Link href="/booking" className={`${theme === 'dark' ? 'text-[#a0998c]' : 'text-[#6b5847]'} hover:text-[#ff6b35] transition-colors`}>{t("Book")}</Link>
                     <Link href="/online-consulting" className={`${theme === 'dark' ? 'text-[#a0998c]' : 'text-[#6b5847]'} hover:text-[#ff6b35] transition-colors`}>{t("Online")}</Link>
-                    <Link href="/reviews" className={`${theme === 'dark' ? 'text-[#a0998c]' : 'text-[#6b5847]'} hover:text-[#ff6b35] transition-colors`}>{t("Reviews")}</Link>
-                    <Link href="/feedback" className={`${theme === 'dark' ? 'text-[#a0998c]' : 'text-[#6b5847]'} hover:text-[#ff6b35] transition-colors`}>{t("Feedback")}</Link>
+                    <Link href="/reviews" className={`${theme === 'dark' ? 'text-[#a0998c]' : 'text-[#6b5847]'} hover:text-[#ff6b35] transition-colors`}>{t("Reviews & Feedback")}</Link>
 
 
                 <Link href="/about" className={`${theme === 'dark' ? 'text-[#a0998c]' : 'text-[#6b5847]'} hover:text-[#ff6b35] transition-colors`}>{t("About")}</Link>
