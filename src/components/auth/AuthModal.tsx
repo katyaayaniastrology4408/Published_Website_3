@@ -87,9 +87,8 @@ export default function AuthModal() {
       setTimeout(() => {
         hideAuthModal();
         resetFields();
-        router.push("/");
-        router.refresh();
-      }, 1500);
+        window.location.reload();
+      }, 500);
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred.");
       toast.error(err.message || "Signup failed");
@@ -131,9 +130,8 @@ export default function AuthModal() {
       setTimeout(() => {
         hideAuthModal();
         resetFields();
-        router.push("/");
-        router.refresh();
-      }, 1500);
+        window.location.reload();
+      }, 500);
     } catch (err: any) {
       const msg = err.message && err.message.includes("does not match") 
         ? "Name or date of birth does not match our records."
