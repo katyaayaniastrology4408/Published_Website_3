@@ -148,16 +148,25 @@ export default function ReviewsPanel({ isDark, t, setSuccess, setError }: any) {
             {t("Review & Rating Management")}
           </CardTitle>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button
             variant="outline"
             size="sm"
             onClick={handleInitializeDb}
             disabled={isInitializing}
-            className="border-amber-500/50 text-amber-500 hover:bg-amber-500/10"
+            className="border-amber-500/50 text-amber-500 hover:bg-amber-500/10 transition-all font-semibold"
           >
-            {isInitializing ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <CheckCircle className="w-4 h-4 mr-1" />}
-            {t("Initialize DB")}
+            {isInitializing ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin mr-1" />
+                {t("Initializing...")}
+              </>
+            ) : (
+              <>
+                <CheckCircle className="w-4 h-4 mr-1" />
+                {t("Initialize DB")}
+              </>
+            )}
           </Button>
           {['all', 'pending', 'approved', 'rejected'].map(mode => (
             <Button

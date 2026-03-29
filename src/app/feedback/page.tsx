@@ -49,21 +49,33 @@ export default function FeedbackPage() {
     async function prefillData() {
       if (user) {
         // Initial set from metadata
+        const metadata = user.user_metadata || {};
+        const initialName = metadata.full_name || metadata.name || metadata.display_name || "";
+        const initialEmail = user.email || metadata.email || "";
+
         setFormData(prev => ({
           ...prev,
-          name: user.user_metadata?.full_name || user.user_metadata?.name || prev.name,
-          email: user.email || prev.email,
+          name: initialName || prev.name,
+          email: initialEmail || prev.email,
         }));
 
         // Fetch from profile for confirmed data
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("name")
-          .eq("id", user.id)
-          .maybeSingle();
-        
-        if (data && !error && data.name) {
-          setFormData(prev => ({ ...prev, name: data.name }));
+        try {
+          const { data, error } = await supabase
+            .from("profiles")
+            .select("name, email")
+            .eq("id", user.id)
+            .maybeSingle();
+          
+          if (data && !error) {
+            setFormData(prev => ({ 
+              ...prev, 
+              name: data.name || prev.name,
+              email: data.email || prev.email 
+            }));
+          }
+        } catch (err) {
+          console.warn("Profile fetch error in feedback:", err);
         }
       }
     }

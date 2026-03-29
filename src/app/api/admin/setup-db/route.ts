@@ -11,7 +11,17 @@ export async function GET() {
 
     // Comprehensive database setup
     const setupSql = `
--- 1. Create offer_settings table
+-- 1. Create profiles table if not exists (Basic schema)
+CREATE TABLE IF NOT EXISTS public.profiles (
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    name TEXT,
+    email TEXT,
+    phone TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 2. Create offer_settings table
 CREATE TABLE IF NOT EXISTS public.offer_settings (
     id BIGINT PRIMARY KEY DEFAULT 1,
     is_active BOOLEAN DEFAULT FALSE,
@@ -29,7 +39,7 @@ CREATE TABLE IF NOT EXISTS public.offer_settings (
     CONSTRAINT single_row CHECK (id = 1)
 );
 
--- 2. Create reviews table
+-- 3. Create reviews table
 CREATE TABLE IF NOT EXISTS public.reviews (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,
@@ -41,7 +51,7 @@ CREATE TABLE IF NOT EXISTS public.reviews (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 3. Create function to increment offer slots
+-- 4. Create function to increment offer slots
 CREATE OR REPLACE FUNCTION public.increment_offer_slot()
 RETURNS void AS $$
 BEGIN
@@ -51,26 +61,26 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- 4. Set up RLS
+-- 5. Set up RLS
 ALTER TABLE public.offer_settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
--- 5. Insert default offer (₹501, 6 months)
+-- 6. RLS Policies for Reviews
+DROP POLICY IF EXISTS "Allow public read-only access to approved reviews" ON public.reviews;
+CREATE POLICY "Allow public read-only access to approved reviews" ON public.reviews
+    FOR SELECT USING (status = 'approved');
+
+DROP POLICY IF EXISTS "Allow public to insert reviews" ON public.reviews;
+CREATE POLICY "Allow public to insert reviews" ON public.reviews
+    FOR INSERT WITH CHECK (true);
+
+-- 7. Insert default offer if not exists
 INSERT INTO public.offer_settings (
     id, is_active, title, max_slots, used_slots, offer_price, original_price, start_date, end_date, urgency_text, popup_text
 ) VALUES (
     1, true, 'First 50 Users Special Offer', 50, 0, 501, 501, NOW(), NOW() + INTERVAL '6 months', 'Only 50 Slots Available', '🎉 First 50 Users Offer – Book Now at ₹501 Only!'
-) ON CONFLICT (id) DO UPDATE SET
-    is_active = true,
-    title = 'First 50 Users Special Offer',
-    max_slots = 50,
-    used_slots = 0,
-    offer_price = 501,
-    original_price = 501,
-    start_date = NOW(),
-    end_date = NOW() + INTERVAL '6 months',
-    urgency_text = 'Only 50 Slots Available',
-    popup_text = '🎉 First 50 Users Offer – Book Now at ₹501 Only!';
+) ON CONFLICT (id) DO NOTHING;
     `;
 
     const { error } = await supabaseAdmin.rpc('exec_sql', {
