@@ -129,7 +129,11 @@ export default function AuthModal() {
         router.refresh();
       }, 1500);
     } catch (err: any) {
-      setError(err.message || "An unexpected error occurred.");
+      if (err.message && err.message.includes("does not match")) {
+          setError("Name or date of birth does not match our records.");
+      } else {
+        setError(err.message || "An unexpected error occurred.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -155,55 +159,6 @@ export default function AuthModal() {
       <AlertCircle className="w-4 h-4" />
       {t(msg)}
     </motion.div>
-  );
-
-  // ─── Shared form fields ───
-  const FormFields = () => (
-    <>
-      <div className="space-y-2">
-        <Label className="text-sm font-bold uppercase tracking-widest text-gray-500">{t("Full Name")}</Label>
-        <div className="relative">
-          <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <Input
-            type="text"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            required
-            className="pl-10 h-14 rounded-2xl border-[#ff6b35]/30 focus:border-[#ff6b35]"
-            placeholder={t("Enter your full name")}
-          />
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label className="text-sm font-bold uppercase tracking-widest text-gray-500">{t("Date of Birth")}</Label>
-        <div className="relative">
-          <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <Input
-            type="date"
-            value={dob}
-            onChange={(e) => setDob(e.target.value)}
-            required
-            className="pl-10 h-14 rounded-2xl border-[#ff6b35]/30 focus:border-[#ff6b35]"
-          />
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label className="text-sm font-bold uppercase tracking-widest text-gray-500">{t("Email Address")}</Label>
-        <div className="relative">
-          <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <Input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="pl-10 h-14 rounded-2xl border-[#ff6b35]/30 focus:border-[#ff6b35]"
-            placeholder="your@email.com"
-          />
-        </div>
-      </div>
-    </>
   );
 
   return (
@@ -284,7 +239,49 @@ export default function AuthModal() {
                     {t("New here?")} <button type="button" onClick={() => { setCurrentView('signup'); resetFields(); }} className="text-[#ff6b35] font-bold hover:underline">{t("Create Account")}</button>
                   </p>
 
-                  <FormFields />
+                  <div className="space-y-2">
+                    <Label className="text-sm font-bold uppercase tracking-widest text-gray-500">{t("Full Name")}</Label>
+                    <div className="relative">
+                      <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <Input
+                        type="text"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                        required
+                        className="pl-10 h-14 rounded-2xl border-[#ff6b35]/30 focus:border-[#ff6b35]"
+                        placeholder={t("Enter your full name")}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-sm font-bold uppercase tracking-widest text-gray-500">{t("Date of Birth")}</Label>
+                    <div className="relative">
+                      <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <Input
+                        type="date"
+                        value={dob}
+                        onChange={(e) => setDob(e.target.value)}
+                        required
+                        className="pl-10 h-14 rounded-2xl border-[#ff6b35]/30 focus:border-[#ff6b35]"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-sm font-bold uppercase tracking-widest text-gray-500">{t("Email Address")}</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <Input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        className="pl-10 h-14 rounded-2xl border-[#ff6b35]/30 focus:border-[#ff6b35]"
+                        placeholder={t("your@email.com")}
+                      />
+                    </div>
+                  </div>
 
                   {error && <FieldError msg={error} />}
 
@@ -353,7 +350,49 @@ export default function AuthModal() {
                     <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
                   </div>
 
-                  <FormFields />
+                  <div className="space-y-2">
+                    <Label className="text-sm font-bold uppercase tracking-widest text-gray-500">{t("Full Name")}</Label>
+                    <div className="relative">
+                      <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <Input
+                        type="text"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                        required
+                        className="pl-10 h-14 rounded-2xl border-[#ff6b35]/30 focus:border-[#ff6b35]"
+                        placeholder={t("Enter your full name")}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-sm font-bold uppercase tracking-widest text-gray-500">{t("Date of Birth")}</Label>
+                    <div className="relative">
+                      <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <Input
+                        type="date"
+                        value={dob}
+                        onChange={(e) => setDob(e.target.value)}
+                        required
+                        className="pl-10 h-14 rounded-2xl border-[#ff6b35]/30 focus:border-[#ff6b35]"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-sm font-bold uppercase tracking-widest text-gray-500">{t("Email Address")}</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <Input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        className="pl-10 h-14 rounded-2xl border-[#ff6b35]/30 focus:border-[#ff6b35]"
+                        placeholder={t("your@email.com")}
+                      />
+                    </div>
+                  </div>
 
                   {error && <FieldError msg={error} />}
 

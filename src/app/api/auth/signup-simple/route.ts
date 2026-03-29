@@ -61,10 +61,18 @@ export async function POST(req: Request) {
       if (profileError) console.error('[SignupSimple] Profile error:', profileError);
 
       // Sync subscriber
-      await syncToSubscribers(email, fullName, 'profile_signup', false).catch(() => {});
+      try {
+        await syncToSubscribers(email, fullName, 'profile_signup', false);
+      } catch (err) {
+        console.error('[SignupSimple] Subscriber sync error:', err);
+      }
 
-      // Send welcome email (non-blocking)
-      sendWelcomeEmail({ email, name: fullName }).catch(e => console.error('[SignupSimple] Welcome email error:', e));
+      // Send welcome email
+      try {
+        await sendWelcomeEmail({ email, name: fullName });
+      } catch (e) {
+        console.error('[SignupSimple] Welcome email error:', e);
+      }
     }
 
     // Sign in to get session tokens
